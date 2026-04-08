@@ -12,38 +12,35 @@
     "17624535193cb88f04": {
       "type": "_blocks",
       "blocks": {
-        "ai_gen_block_419bab9_PwWeXU": {
-          "type": "ai_gen_block_419bab9",
+        "ai_gen_block_e7f925e_8hwXcH": {
+          "type": "ai_gen_block_e7f925e",
           "settings": {
             "slideshow_height": 500,
-            "desktop_width_percent": 100,
             "autoplay": true,
-            "autoplay_speed": 5,
-            "transition_speed": 1,
-            "show_navigation": true,
-            "nav_button_size": 40,
-            "nav_button_offset": 20,
-            "nav_button_opacity": 70,
-            "nav_button_color": "#ffffff",
-            "nav_button_icon_color": "#000000",
-            "show_dots": true,
-            "dot_color": "#ffffff",
-            "scrolling_text": "Welcome to our store",
-            "text_height": 50,
+            "slide_duration": 5,
+            "transition_duration": 1,
+            "border_radius": 0,
+            "background_color": "#000000",
+            "desktop_width_percent": 100,
+            "scrolling_text": "Limited Time Offer • Shop Now • Free Shipping",
+            "scroll_speed": 15,
             "text_size": 16,
-            "text_weight": "400",
-            "scroll_speed": 1,
-            "text_spacing": 40,
-            "text_background_color": "#000000",
+            "text_weight": "600",
+            "text_padding": 15,
             "text_color": "#ffffff",
-            "separator_size": 6,
-            "separator_color": "#ffffff"
+            "text_background_color": "#d80000",
+            "show_controls": true,
+            "show_dots": true,
+            "button_background_color": "#ffffff",
+            "button_hover_background_color": "#f3f3f3",
+            "button_icon_color": "#121212",
+            "dot_color": "#ffffff"
           },
           "blocks": {}
         }
       },
       "block_order": [
-        "ai_gen_block_419bab9_PwWeXU"
+        "ai_gen_block_e7f925e_8hwXcH"
       ],
       "settings": {}
     },
