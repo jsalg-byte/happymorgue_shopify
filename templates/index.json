@@ -156,38 +156,31 @@
     "1762369267aa361c1c": {
       "type": "_blocks",
       "blocks": {
-        "ai_gen_block_929772f_fziiGj": {
-          "type": "ai_gen_block_929772f",
+        "ai_gen_block_3549ab6_a7D7Yt": {
+          "type": "ai_gen_block_3549ab6",
           "settings": {
-            "heading": "Past Events",
-            "heading_alignment": "center",
-            "heading_size": 36,
-            "heading_color": "#ffffff",
-            "heading_spacing": 30,
-            "background_color": "#000000",
-            "section_padding": 60,
-            "desktop_width_percent": 100,
-            "poster_width": 300,
+            "show_title": true,
+            "title": "Past Events",
+            "title_size": 32,
+            "title_color": "#ffffff",
+            "title_alignment": "center",
+            "title_spacing": 30,
+            "scroll_speed": 1,
+            "poster_width": 240,
             "poster_aspect_ratio": "0.667",
-            "poster_gap": 40,
-            "poster_border_radius": 8,
-            "shadow_horizontal": 0,
-            "shadow_vertical": 10,
-            "shadow_blur": 30,
-            "shadow_opacity": 0.5,
-            "show_nav_buttons": true,
-            "nav_button_color": "#ffffff",
-            "nav_button_icon_color": "#000000",
-            "flier_1": "shopify://shop_images/IMG_9332.jpg",
-            "flier_2": "shopify://shop_images/ADCB022C-7BEC-45E3-9295-7D9912D1AA94_748f08e4-9086-4efb-bb87-d7758150be8a.jpg",
-            "flier_3": "shopify://shop_images/41E6E6B8-BC0A-4C83-8AFF-F1651E496D69.jpg",
-            "flier_4": "shopify://shop_images/6E0F0E36-2F02-4F0E-A48E-2D573479C7AB.jpg"
+            "poster_gap": 20,
+            "section_padding": 40,
+            "background_color": "#000000",
+            "flyer_1": "shopify://shop_images/IMG_9332.jpg",
+            "flyer_2": "shopify://shop_images/ADCB022C-7BEC-45E3-9295-7D9912D1AA94_748f08e4-9086-4efb-bb87-d7758150be8a.jpg",
+            "flyer_3": "shopify://shop_images/10E2B59B-6B34-4A47-8DBC-CE70EA57170D.jpg",
+            "flyer_4": "shopify://shop_images/6E0F0E36-2F02-4F0E-A48E-2D573479C7AB.jpg"
           },
           "blocks": {}
         }
       },
       "block_order": [
-        "ai_gen_block_929772f_fziiGj"
+        "ai_gen_block_3549ab6_a7D7Yt"
       ],
       "settings": {}
     },
