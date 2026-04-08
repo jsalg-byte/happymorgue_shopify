@@ -1,6 +1,795 @@
+{% doc %}
+  @prompt
+    Ok make a section that automatically scrolls from left to right but can be paused when tapped for our past event fliers. Make it look like movie posters on display. Give us unlimited entries so we can add more as we do more events. Make it very minimal and clean no big buttons. Very minimal like a display of our past events showcased like movie posters passing by also add the option to edit the speed that it sidescrolls
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-event-flyers-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    background-color: {{ block.settings.background_color }};
+    padding: {{ block.settings.section_padding }}px 0;
+  }
+
+  .ai-event-flyers-track-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.poster_gap }}px;
+    will-change: transform;
+  }
+
+  .ai-event-flyers-track-{{ ai_gen_id }}.paused {
+    animation-play-state: paused;
+  }
+
+  .ai-event-flyers-item-{{ ai_gen_id }} {
+    flex-shrink: 0;
+    width: {{ block.settings.poster_width }}px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+
+  .ai-event-flyers-item-{{ ai_gen_id }}:hover {
+    transform: scale(1.02);
+  }
+
+  .ai-event-flyers-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ block.settings.poster_aspect_ratio }};
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .ai-event-flyers-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-event-flyers-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-event-flyers-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-event-flyers-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 16px;
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-event-flyers-item-{{ ai_gen_id }} {
+      width: {{ block.settings.poster_width | times: 0.7 }}px;
+    }
+  }
+{% endstyle %}
+
+<event-flyers-{{ ai_gen_id }}
+  class="ai-event-flyers-{{ ai_gen_id }}"
+  data-scroll-speed="{{ block.settings.scroll_speed }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-event-flyers-track-{{ ai_gen_id }}">
+    {% liquid
+      assign has_images = false
+      for i in (1..50)
+        assign image_key = 'flyer_' | append: i
+        if block.settings[image_key] != blank
+          assign has_images = true
+          break
+        endif
+      endfor
+    %}
+
+    {% if has_images %}
+      {% for i in (1..50) %}
+        {% liquid
+          assign image_key = 'flyer_' | append: i
+          assign flyer_image = block.settings[image_key]
+        %}
+        
+        {% if flyer_image != blank %}
+          <div class="ai-event-flyers-item-{{ ai_gen_id }}">
+            <div class="ai-event-flyers-image-wrapper-{{ ai_gen_id }}">
+              <img
+                src="{{ flyer_image | image_url: width: 800 }}"
+                alt="Event flyer {{ i }}"
+                loading="lazy"
+                width="{{ block.settings.poster_width }}"
+                height="{{ block.settings.poster_width | divided_by: block.settings.poster_aspect_ratio }}"
+                class="ai-event-flyers-image-{{ ai_gen_id }}"
+              >
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      {% for i in (1..50) %}
+        {% liquid
+          assign image_key = 'flyer_' | append: i
+          assign flyer_image = block.settings[image_key]
+        %}
+        
+        {% if flyer_image != blank %}
+          <div class="ai-event-flyers-item-{{ ai_gen_id }}">
+            <div class="ai-event-flyers-image-wrapper-{{ ai_gen_id }}">
+              <img
+                src="{{ flyer_image | image_url: width: 800 }}"
+                alt="Event flyer {{ i }}"
+                loading="lazy"
+                width="{{ block.settings.poster_width }}"
+                height="{{ block.settings.poster_width | divided_by: block.settings.poster_aspect_ratio }}"
+                class="ai-event-flyers-image-{{ ai_gen_id }}"
+              >
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      {% for i in (1..5) %}
+        <div class="ai-event-flyers-item-{{ ai_gen_id }}">
+          <div class="ai-event-flyers-image-wrapper-{{ ai_gen_id }}">
+            <div class="ai-event-flyers-placeholder-{{ ai_gen_id }}">
+              {{ 'image' | placeholder_svg_tag }}
+              {% if i == 3 %}
+                <div class="ai-event-flyers-empty-state-{{ ai_gen_id }}">
+                  Add event flyers
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+</event-flyers-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class EventFlyers{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.track = null;
+        this.isPaused = false;
+        this.animationId = null;
+        this.currentPosition = 0;
+        this.scrollSpeed = 0;
+      }
+
+      connectedCallback() {
+        this.track = this.querySelector('.ai-event-flyers-track-{{ ai_gen_id }}');
+        this.scrollSpeed = parseFloat(this.dataset.scrollSpeed) || 1;
+        
+        this.setupEventListeners();
+        this.startScrolling();
+      }
+
+      setupEventListeners() {
+        this.track.addEventListener('click', () => {
+          this.togglePause();
+        });
+
+        this.track.addEventListener('mouseenter', () => {
+          if (!this.isPaused) {
+            this.togglePause();
+          }
+        });
+
+        this.track.addEventListener('mouseleave', () => {
+          if (this.isPaused) {
+            this.togglePause();
+          }
+        });
+
+        this.track.addEventListener('touchstart', () => {
+          this.togglePause();
+        });
+      }
+
+      togglePause() {
+        this.isPaused = !this.isPaused;
+        
+        if (this.isPaused) {
+          this.track.classList.add('paused');
+        } else {
+          this.track.classList.remove('paused');
+        }
+      }
+
+      startScrolling() {
+        const items = this.track.querySelectorAll('.ai-event-flyers-item-{{ ai_gen_id }}');
+        if (items.length === 0) return;
+
+        const firstItem = items[0];
+        const itemWidth = firstItem.offsetWidth;
+        const gap = {{ block.settings.poster_gap }};
+        const totalWidth = (itemWidth + gap) * (items.length / 2);
+
+        const animate = () => {
+          if (!this.isPaused) {
+            this.currentPosition -= this.scrollSpeed;
+            
+            if (Math.abs(this.currentPosition) >= totalWidth) {
+              this.currentPosition = 0;
+            }
+            
+            this.track.style.transform = `translateX(${this.currentPosition}px)`;
+          }
+          
+          this.animationId = requestAnimationFrame(animate);
+        };
+
+        animate();
+      }
+
+      disconnectedCallback() {
+        if (this.animationId) {
+          cancelAnimationFrame(this.animationId);
+        }
+      }
+    }
+
+    customElements.define('event-flyers-{{ ai_gen_id }}', EventFlyers{{ ai_gen_id }});
+  })();
+</script>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Event flyers",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Scroll settings"
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "min": 0.5,
+      "max": 5,
+      "step": 0.5,
+      "label": "Scroll speed",
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Poster style"
+    },
+    {
+      "type": "range",
+      "id": "poster_width",
+      "min": 150,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "Poster width",
+      "default": 240
+    },
+    {
+      "type": "select",
+      "id": "poster_aspect_ratio",
+      "label": "Poster aspect ratio",
+      "options": [
+        {
+          "value": "0.667",
+          "label": "2:3 (Movie poster)"
+        },
+        {
+          "value": "0.707",
+          "label": "5:7"
+        },
+        {
+          "value": "0.75",
+          "label": "3:4"
+        },
+        {
+          "value": "1",
+          "label": "1:1 (Square)"
+        }
+      ],
+      "default": "0.667"
+    },
+    {
+      "type": "range",
+      "id": "poster_gap",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Gap between posters",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Section padding",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_1",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_2",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_3",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_4",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_5",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_6",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_7",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_8",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 9"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_9",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 10"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_10",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 11"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_11",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 12"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_12",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 13"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_13",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 14"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_14",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 15"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_15",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 16"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_16",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 17"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_17",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 18"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_18",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 19"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_19",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 20"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_20",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 21"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_21",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 22"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_22",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 23"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_23",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 24"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_24",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 25"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_25",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 26"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_26",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 27"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_27",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 28"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_28",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 29"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_29",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 30"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_30",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 31"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_31",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 32"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_32",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 33"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_33",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 34"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_34",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 35"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_35",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 36"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_36",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 37"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_37",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 38"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_38",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 39"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_39",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 40"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_40",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 41"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_41",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 42"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_42",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 43"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_43",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 44"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_44",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 45"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_45",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 46"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_46",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 47"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_47",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 48"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_48",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 49"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_49",
+      "label": "Flyer image"
+    },
+    {
+      "type": "header",
+      "content": "Event flyer 50"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyer_50",
+      "label": "Flyer image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Event flyers"
+    }
+  ]
+}
 {% endschema %}
