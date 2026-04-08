@@ -9,82 +9,82 @@
  */
 {
   "sections": {
-    "blackroom_home": {
-      "type": "blackroom-home",
-      "blocks": {
-        "feature_shop": {
-          "type": "feature",
-          "disabled": true,
-          "settings": {
-            "title": "Shop",
-            "text": "Grab drops and merch from the collective.",
-            "button_label": "View Shop",
-            "button_link": "shopify://collections/all"
-          }
-        }
-      },
-      "block_order": [
-        "feature_shop"
-      ],
-      "settings": {
-        "eyebrow": "",
-        "heading": "",
-        "subheading": "",
-        "hero_video_url": "",
-        "hero_image": "shopify://shop_images/IMG_6166.jpg",
-        "hero_button_label": "",
-        "hero_button_link": "shopify://collections/all",
-        "marquee_text": "",
-        "stats_heading": "Happy Morgue",
-        "stats_subheading": "",
-        "stat_1_value": "",
-        "stat_1_label": "",
-        "stat_2_value": "",
-        "stat_2_label": "",
-        "stat_3_value": "",
-        "stat_3_label": "",
-        "newsletter_heading": "",
-        "newsletter_text": "",
-        "newsletter_button_label": "Subscribe"
-      }
-    },
     "17624535193cb88f04": {
       "type": "_blocks",
       "blocks": {
-        "ai_gen_block_112a929_rckLLD": {
-          "type": "ai_gen_block_112a929",
-          "name": "Clothing products",
+        "ai_gen_block_419bab9_PwWeXU": {
+          "type": "ai_gen_block_419bab9",
           "settings": {
-            "heading": "Shop",
-            "description": "",
-            "collection": "clothing",
-            "products_to_show": 12,
-            "columns_desktop": 4,
-            "columns_tablet": 3,
-            "columns_mobile": "2",
-            "text_alignment": "left",
-            "grid_gap": 36,
-            "max_width": 1500,
-            "background_color": "#000000",
-            "heading_color": "#ffffff",
+            "slideshow_height": 500,
+            "desktop_width_percent": 100,
+            "autoplay": true,
+            "autoplay_speed": 5,
+            "transition_speed": 1,
+            "show_navigation": true,
+            "nav_button_size": 40,
+            "nav_button_offset": 20,
+            "nav_button_opacity": 70,
+            "nav_button_color": "#ffffff",
+            "nav_button_icon_color": "#000000",
+            "show_dots": true,
+            "dot_color": "#ffffff",
+            "scrolling_text": "Welcome to our store",
+            "text_height": 50,
+            "text_size": 16,
+            "text_weight": "400",
+            "scroll_speed": 1,
+            "text_spacing": 40,
+            "text_background_color": "#000000",
             "text_color": "#ffffff",
-            "price_color": "#ffffff",
-            "heading_size": 32,
-            "description_size": 16,
-            "image_radius": 0,
-            "section_padding": 40
+            "separator_size": 6,
+            "separator_color": "#ffffff"
           },
           "blocks": {}
         }
       },
       "block_order": [
-        "ai_gen_block_112a929_rckLLD"
+        "ai_gen_block_419bab9_PwWeXU"
       ],
       "settings": {}
     },
     "1762452594d4c90158": {
       "type": "_blocks",
       "blocks": {
+        "ai_gen_block_93aa28d_TrYizn": {
+          "type": "ai_gen_block_93aa28d",
+          "settings": {
+            "title": "SHOP",
+            "description": "",
+            "collection": "clothing",
+            "products_limit": 12,
+            "container_width": 1200,
+            "section_padding": 40,
+            "header_spacing": 30,
+            "text_alignment": "left",
+            "card_width": 280,
+            "card_width_mobile": 200,
+            "product_gap": 20,
+            "card_padding": 16,
+            "card_radius": 0,
+            "track_padding": 4,
+            "image_ratio": "1",
+            "show_navigation": true,
+            "nav_position": "center",
+            "nav_spacing": 20,
+            "dot_size": 6,
+            "dot_spacing": 8,
+            "dot_opacity": 30,
+            "background_color": "#000000",
+            "text_color": "#ffffff",
+            "card_background": "#000000",
+            "dot_color": "#121212",
+            "title_size": 32,
+            "description_size": 16,
+            "product_title_size": 16,
+            "product_price_size": 14
+          },
+          "blocks": {}
+        },
         "ai_gen_block_69ab944_eJLtXP": {
           "type": "ai_gen_block_69ab944",
           "disabled": true,
@@ -148,12 +148,47 @@
         }
       },
       "block_order": [
+        "ai_gen_block_93aa28d_TrYizn",
         "ai_gen_block_69ab944_eJLtXP"
       ],
       "settings": {}
     },
     "1762369267aa361c1c": {
       "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_929772f_fziiGj": {
+          "type": "ai_gen_block_929772f",
+          "settings": {
+            "heading": "Past Events",
+            "heading_alignment": "center",
+            "heading_size": 36,
+            "heading_color": "#ffffff",
+            "heading_spacing": 30,
+            "background_color": "#000000",
+            "section_padding": 60,
+            "desktop_width_percent": 100,
+            "poster_width": 300,
+            "poster_aspect_ratio": "0.667",
+            "poster_gap": 20,
+            "poster_border_radius": 8,
+            "shadow_horizontal": 0,
+            "shadow_vertical": 10,
+            "shadow_blur": 30,
+            "shadow_opacity": 0.5,
+            "show_nav_buttons": true,
+            "nav_button_color": "#ffffff",
+            "nav_button_icon_color": "#000000",
+            "flier_1": "shopify://shop_images/IMG_9332.jpg",
+            "flier_2": "shopify://shop_images/ADCB022C-7BEC-45E3-9295-7D9912D1AA94_748f08e4-9086-4efb-bb87-d7758150be8a.jpg",
+            "flier_3": "shopify://shop_images/41E6E6B8-BC0A-4C83-8AFF-F1651E496D69.jpg",
+            "flier_4": "shopify://shop_images/6E0F0E36-2F02-4F0E-A48E-2D573479C7AB.jpg"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_929772f_fziiGj"
+      ],
       "settings": {}
     },
     "1762319216ce3d6c3d": {
@@ -672,7 +707,6 @@
     }
   },
   "order": [
-    "blackroom_home",
     "17624535193cb88f04",
     "1762452594d4c90158",
     "1762369267aa361c1c",
