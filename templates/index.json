@@ -22,13 +22,13 @@
             "border_radius": 0,
             "background_color": "#000000",
             "desktop_width_percent": 100,
-            "scrolling_text": "Limited Time Offer • Shop Now • Free Shipping",
+            "scrolling_text": "",
             "scroll_speed": 15,
             "text_size": 16,
             "text_weight": "600",
             "text_padding": 15,
             "text_color": "#ffffff",
-            "text_background_color": "#d80000",
+            "text_background_color": "#000000",
             "show_controls": true,
             "show_dots": true,
             "button_background_color": "#ffffff",
@@ -153,6 +153,33 @@
     "1762369267aa361c1c": {
       "type": "_blocks",
       "blocks": {
+        "ai_gen_block_da36957_8CTnnH": {
+          "type": "ai_gen_block_da36957",
+          "settings": {
+            "button_text": "Upcoming Events",
+            "button_link": "shopify://pages/contact",
+            "button_font_size": 14,
+            "button_padding_vertical": 16,
+            "button_padding_horizontal": 32,
+            "button_background": "#000000",
+            "button_text_color": "#ffffff",
+            "button_hover_background": "#f3f3f3",
+            "button_hover_text_color": "#000000",
+            "button_border_thickness": 1,
+            "button_border_color": "#000000",
+            "button_hover_border_color": "#000000",
+            "poster_image": "shopify://shop_images/3981C3A6-5820-49B0-B252-41581E50BA9B.jpg",
+            "poster_aspect_ratio": "2/3",
+            "poster_max_width": 300,
+            "poster_border_thickness": 1,
+            "poster_border_color": "#000000",
+            "desktop_width_percent": 100,
+            "spacing": 40,
+            "padding": 20,
+            "background_color": "#ffffff"
+          },
+          "blocks": {}
+        },
         "ai_gen_block_3549ab6_a7D7Yt": {
           "type": "ai_gen_block_3549ab6",
           "settings": {
@@ -177,6 +204,7 @@
         }
       },
       "block_order": [
+        "ai_gen_block_da36957_8CTnnH",
         "ai_gen_block_3549ab6_a7D7Yt"
       ],
       "settings": {}
