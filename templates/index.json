@@ -169,7 +169,7 @@
             "desktop_width_percent": 100,
             "poster_width": 300,
             "poster_aspect_ratio": "0.667",
-            "poster_gap": 20,
+            "poster_gap": 40,
             "poster_border_radius": 8,
             "shadow_horizontal": 0,
             "shadow_vertical": 10,
