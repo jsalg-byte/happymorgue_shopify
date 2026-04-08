@@ -1,0 +1,347 @@
+{{ 'blackroom-home.css' | asset_url | stylesheet_tag }}
+
+<section class="blackroom-home section-{{ section.id }}">
+  <div class="blackroom-home__hero">
+    <div class="blackroom-home__media" aria-hidden="true">
+      {%- if section.settings.hero_video_url != blank -%}
+        <video
+          class="blackroom-home__video"
+          autoplay
+          loop
+          muted
+          playsinline
+          preload="metadata"
+          {% if section.settings.hero_image != blank %}
+            poster="{{ section.settings.hero_image | image_url: width: 2400 }}"
+          {% endif %}
+        >
+          <source src="{{ section.settings.hero_video_url | escape }}" type="video/mp4">
+        </video>
+      {%- elsif section.settings.hero_image != blank -%}
+        {{
+          section.settings.hero_image
+          | image_url: width: 2400
+          | image_tag:
+            loading: 'lazy',
+            widths: '750, 1200, 1600, 2000, 2400',
+            class: 'blackroom-home__image',
+            alt: section.settings.heading
+        }}
+      {%- else -%}
+        {{ 'lifestyle-2' | placeholder_svg_tag: 'blackroom-home__placeholder' }}
+      {%- endif -%}
+    </div>
+
+    <div class="blackroom-home__hero-overlay"></div>
+
+    <div class="blackroom-home__hero-content page-width">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="blackroom-home__eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+
+      <h1 class="blackroom-home__heading">{{ section.settings.heading }}</h1>
+
+      {%- if section.settings.subheading != blank -%}
+        <p class="blackroom-home__subheading">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.hero_button_label != blank -%}
+        <a
+          class="blackroom-home__hero-button"
+          {% if section.settings.hero_button_link != blank %}
+            href="{{ section.settings.hero_button_link }}"
+          {% else %}
+            role="link"
+            aria-disabled="true"
+          {% endif %}
+        >
+          {{ section.settings.hero_button_label }}
+        </a>
+      {%- endif -%}
+
+      <span class="blackroom-home__scroll">Scroll</span>
+    </div>
+  </div>
+
+  {%- assign marquee_copy = section.settings.marquee_text | strip -%}
+  {%- if marquee_copy != blank -%}
+    <div class="blackroom-home__marquee" aria-hidden="true">
+      <div class="blackroom-home__marquee-track">
+        {%- for _ in (1..6) -%}
+          <span>{{ marquee_copy }}</span>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="blackroom-home__cards page-width">
+    {%- for block in section.blocks -%}
+      <article class="blackroom-home__card" {{ block.shopify_attributes }}>
+        <h2>{{ block.settings.title }}</h2>
+
+        {%- if block.settings.text != blank -%}
+          <p>{{ block.settings.text }}</p>
+        {%- endif -%}
+
+        {%- if block.settings.button_label != blank -%}
+          <a
+            class="blackroom-home__card-link"
+            {% if block.settings.button_link != blank %}
+              href="{{ block.settings.button_link }}"
+            {% else %}
+              role="link"
+              aria-disabled="true"
+            {% endif %}
+          >
+            {{ block.settings.button_label }}
+          </a>
+        {%- endif -%}
+      </article>
+    {%- endfor -%}
+  </div>
+
+  <div class="blackroom-home__bottom page-width">
+    <div class="blackroom-home__stats">
+      <h3>{{ section.settings.stats_heading }}</h3>
+      <p>{{ section.settings.stats_subheading }}</p>
+      <div class="blackroom-home__stat-grid">
+        <div class="blackroom-home__stat-item">
+          <span>{{ section.settings.stat_1_value }}</span>
+          <small>{{ section.settings.stat_1_label }}</small>
+        </div>
+        <div class="blackroom-home__stat-item">
+          <span>{{ section.settings.stat_2_value }}</span>
+          <small>{{ section.settings.stat_2_label }}</small>
+        </div>
+        <div class="blackroom-home__stat-item">
+          <span>{{ section.settings.stat_3_value }}</span>
+          <small>{{ section.settings.stat_3_label }}</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="blackroom-home__updates">
+      <h3>{{ section.settings.newsletter_heading }}</h3>
+      <p>{{ section.settings.newsletter_text }}</p>
+
+      {%- form 'customer', class: 'blackroom-home__newsletter-form' -%}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <label class="visually-hidden" for="BlackroomNewsletter--{{ section.id }}">Email</label>
+        <input
+          id="BlackroomNewsletter--{{ section.id }}"
+          type="email"
+          name="contact[email]"
+          value="{{ form.email }}"
+          autocorrect="off"
+          autocapitalize="off"
+          autocomplete="email"
+          required
+          placeholder="you@nightmail.com"
+        >
+        <button type="submit">{{ section.settings.newsletter_button_label }}</button>
+
+        {%- if form.posted_successfully? -%}
+          <p class="blackroom-home__form-success">Thanks. You are on the list.</p>
+        {%- endif -%}
+
+        {%- if form.errors -%}
+          <p class="blackroom-home__form-error">
+            {{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}
+          </p>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Blackroom Home",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Miami Techno Community"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "HAPPY MORGUE"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Underground events, distorted visuals, and hard sounds from the edge of the dance floor."
+    },
+    {
+      "type": "url",
+      "id": "hero_video_url",
+      "label": "Hero video URL (MP4)"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero fallback image"
+    },
+    {
+      "type": "text",
+      "id": "hero_button_label",
+      "label": "Hero button label",
+      "default": "View Events"
+    },
+    {
+      "type": "url",
+      "id": "hero_button_link",
+      "label": "Hero button link"
+    },
+    {
+      "type": "text",
+      "id": "marquee_text",
+      "label": "Marquee text",
+      "default": "HAPPY MORGUE - UNDERGROUND EVENTS - HARD TECHNO - MIAMI NIGHTS"
+    },
+    {
+      "type": "text",
+      "id": "stats_heading",
+      "label": "Stats heading",
+      "default": "Happy Morgue"
+    },
+    {
+      "type": "text",
+      "id": "stats_subheading",
+      "label": "Stats subheading",
+      "default": "Worldwide underground movement"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_value",
+      "label": "Stat 1 value",
+      "default": "200+"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_label",
+      "label": "Stat 1 label",
+      "default": "Artists"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_value",
+      "label": "Stat 2 value",
+      "default": "10"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_label",
+      "label": "Stat 2 label",
+      "default": "Cities"
+    },
+    {
+      "type": "text",
+      "id": "stat_3_value",
+      "label": "Stat 3 value",
+      "default": "7"
+    },
+    {
+      "type": "text",
+      "id": "stat_3_label",
+      "label": "Stat 3 label",
+      "default": "Countries"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "Newsletter heading",
+      "default": "Get Updates"
+    },
+    {
+      "type": "textarea",
+      "id": "newsletter_text",
+      "label": "Newsletter text",
+      "default": "Be first to hear about upcoming events and exclusive drops."
+    },
+    {
+      "type": "text",
+      "id": "newsletter_button_label",
+      "label": "Newsletter button label",
+      "default": "Subscribe"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Upcoming"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "See what is next in the lineup."
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "View All"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Blackroom Home",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "title": "Upcoming",
+            "text": "See what is next in the lineup.",
+            "button_label": "View All"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "Radio",
+            "text": "Explore fresh mixes and sets.",
+            "button_label": "Browse All"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "Live From Events",
+            "text": "Catch footage and edits from the floor.",
+            "button_label": "Watch"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "title": "Shop",
+            "text": "Grab drops and merch from the collective.",
+            "button_label": "View Shop"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

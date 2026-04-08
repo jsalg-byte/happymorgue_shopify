@@ -1,0 +1,1214 @@
+{% doc %}
+  @prompt
+    Create a retro 8-bit zombie shooter game called "Night of the Dead" with horror movie arcade aesthetic. Player is a simple blocky blonde female character in orange prison jumpsuit, positioned on the left side, moves up and down using arrow keys or swipe on mobile. Simple pixelated full-body zombies with undead features walk from right to left. Player shoots right by clicking or tapping. Difficulty progression: start slow with easy zombie spawns, gradually increase speed and spawn rate until capped at a fair challenging speed. Occasionally spawn fat zombies that are harder to kill and move faster. Zombies spawn frequently at higher levels, move at different speeds, some take multiple hits. Player has 3 lives shown as VISIBLE HEART ICONS displayed on screen showing health status. IMPORTANT: Player dies instantly on collision with any zombie and loses a life. Zombies reaching the left edge also cause damage and lose a life. Include pixel muzzle flash when shooting, chunky pixel blood splatter when zombies are hit, score counter with retro font, HIGH SCORE SAVING that persists between sessions. Game over screen: dark souls style with "YOU ARE DEAD" text and "START OVER" button in retro dark aesthetic. Simple clean 2D retro pixel art style, dark horror palette with zombie greens, blood reds, and black background. CUSTOMIZABLE SETTINGS: toggle sound effects for zombie groans, bullet shooting sounds, and enemy killed sounds. Keep sprites very simple and blocky like classic NES games., ok make it smaller screen like a square in the middle so its not covering the full screen, ok make the art style better and more detailed and have the whole aesthetic feel like 80s horror, give it less glow and more horror vhs. make the players character a lara croft look alike, idk try a new look with the pixel style make it retro but uncanny, ok less pink more red with a 80s horror film style. make the zombies creepier and make the background black, make the zombies scarier , ok remve the flashing eyes on the zombies. , make a sound slot for when they explode, give me full customizable settings. one including sounds as well, add the settings to change and add sound effects
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-zombie-game-container-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    background: {{ block.settings.background_color }};
+  }
+
+  .ai-zombie-game-{{ ai_gen_id }} {
+    width: {{ block.settings.game_width }}px;
+    height: {{ block.settings.game_height }}px;
+    margin: 0 auto;
+    background-color: {{ block.settings.game_bg_color }};
+    border: {{ block.settings.border_width }}px solid {{ block.settings.border_color }};
+    position: relative;
+    user-select: none;
+    touch-action: none;
+    box-shadow: 0 0 40px {{ block.settings.border_color }}80, inset 0 0 30px rgba(0, 0, 0, 0.9);
+    filter: contrast({{ block.settings.contrast }}) brightness({{ block.settings.brightness }});
+  }
+
+  .ai-zombie-game-canvas-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: {{ block.settings.game_bg_color }};
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  .ai-zombie-game-crt-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.2),
+      rgba(0, 0, 0, 0.2) 2px,
+      transparent 2px,
+      transparent 4px
+    );
+    pointer-events: none;
+    z-index: 5;
+    {% if block.settings.show_scanlines == false %}display: none;{% endif %}
+  }
+
+  .ai-zombie-game-ui-{{ ai_gen_id }} {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .ai-zombie-game-score-{{ ai_gen_id }} {
+    font-family: 'Courier New', monospace;
+    font-size: {{ block.settings.ui_font_size }}px;
+    color: {{ block.settings.score_color }};
+    text-shadow: 2px 2px 0 #000000;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 8px 12px;
+    border: 3px solid {{ block.settings.score_color }};
+  }
+
+  .ai-zombie-game-lives-{{ ai_gen_id }} {
+    display: flex;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 8px;
+    border: 3px solid {{ block.settings.heart_color }};
+  }
+
+  .ai-zombie-game-heart-{{ ai_gen_id }} {
+    width: 24px;
+    height: 24px;
+    image-rendering: pixelated;
+  }
+
+  .ai-zombie-game-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+  }
+
+  .ai-zombie-game-overlay-{{ ai_gen_id }}.hidden {
+    display: none;
+  }
+
+  .ai-zombie-game-title-{{ ai_gen_id }} {
+    font-family: 'Courier New', monospace;
+    font-size: {{ block.settings.title_font_size }}px;
+    color: {{ block.settings.title_color }};
+    text-shadow: 3px 3px 0 #000000, -2px -2px 0 {{ block.settings.title_shadow_color }};
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 4px;
+  }
+
+  .ai-zombie-game-gameover-{{ ai_gen_id }} {
+    font-family: 'Courier New', monospace;
+    font-size: {{ block.settings.gameover_font_size }}px;
+    color: {{ block.settings.gameover_color }};
+    text-shadow: 4px 4px 0 #000000;
+    margin-bottom: 30px;
+    font-weight: bold;
+    letter-spacing: 8px;
+  }
+
+  .ai-zombie-game-final-score-{{ ai_gen_id }} {
+    font-family: 'Courier New', monospace;
+    font-size: 22px;
+    color: #cccccc;
+    text-shadow: 2px 2px 0 #000000;
+    margin-bottom: 10px;
+  }
+
+  .ai-zombie-game-high-score-{{ ai_gen_id }} {
+    font-family: 'Courier New', monospace;
+    font-size: 20px;
+    color: {{ block.settings.highscore_color }};
+    text-shadow: 2px 2px 0 #000000;
+    margin-bottom: 30px;
+  }
+
+  .ai-zombie-game-button-{{ ai_gen_id }} {
+    font-family: 'Courier New', monospace;
+    font-size: 22px;
+    color: {{ block.settings.button_text_color }};
+    background: {{ block.settings.button_bg_color }};
+    border: 4px solid {{ block.settings.button_border_color }};
+    padding: 14px 35px;
+    cursor: pointer;
+    text-shadow: 2px 2px 0 #000000;
+    font-weight: bold;
+    pointer-events: auto;
+    transition: all 0.1s;
+  }
+
+  .ai-zombie-game-button-{{ ai_gen_id }}:hover {
+    background: {{ block.settings.button_hover_color }};
+    transform: scale(1.05);
+  }
+
+  .ai-zombie-game-button-{{ ai_gen_id }}:active {
+    transform: scale(0.95);
+  }
+
+  .ai-zombie-game-controls-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 15;
+  }
+
+  .ai-zombie-game-control-btn-{{ ai_gen_id }} {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: {{ block.settings.control_text_color }};
+    background-color: rgba(0, 0, 0, 0.85);
+    border: 2px solid {{ block.settings.control_border_color }};
+    padding: 6px 10px;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .ai-zombie-game-control-btn-{{ ai_gen_id }}:hover {
+    background-color: rgba(50, 0, 0, 0.9);
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-zombie-game-{{ ai_gen_id }} {
+      width: 90vw;
+      height: 90vw;
+      max-width: 500px;
+      max-height: 500px;
+    }
+
+    .ai-zombie-game-title-{{ ai_gen_id }} {
+      font-size: 28px;
+    }
+
+    .ai-zombie-game-gameover-{{ ai_gen_id }} {
+      font-size: 36px;
+    }
+
+    .ai-zombie-game-button-{{ ai_gen_id }} {
+      font-size: 18px;
+      padding: 12px 28px;
+    }
+
+    .ai-zombie-game-score-{{ ai_gen_id }} {
+      font-size: 14px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-zombie-game-container-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <zombie-shooter-{{ ai_gen_id }} 
+    class="ai-zombie-game-{{ ai_gen_id }}" 
+    data-sound-enabled="{{ block.settings.sound_enabled }}"
+    data-shoot-freq="{{ block.settings.shoot_sound_freq }}"
+    data-explode-freq="{{ block.settings.explode_sound_freq }}"
+    data-groan-freq="{{ block.settings.groan_sound_freq }}"
+    data-shoot-duration="{{ block.settings.shoot_sound_duration }}"
+    data-explode-duration="{{ block.settings.explode_sound_duration }}"
+    data-groan-duration="{{ block.settings.groan_sound_duration }}"
+    data-shoot-volume="{{ block.settings.shoot_sound_volume }}"
+    data-explode-volume="{{ block.settings.explode_sound_volume }}"
+    data-groan-volume="{{ block.settings.groan_sound_volume }}">
+    <canvas class="ai-zombie-game-canvas-{{ ai_gen_id }}" width="{{ block.settings.game_width }}" height="{{ block.settings.game_height }}"></canvas>
+    <div class="ai-zombie-game-crt-{{ ai_gen_id }}"></div>
+    
+    <div class="ai-zombie-game-ui-{{ ai_gen_id }}">
+      <div class="ai-zombie-game-score-{{ ai_gen_id }}">SCORE: <span class="score-value">0</span></div>
+      <div class="ai-zombie-game-lives-{{ ai_gen_id }}">
+        <svg class="ai-zombie-game-heart-{{ ai_gen_id }}" viewBox="0 0 8 8" fill="{{ block.settings.heart_color }}">
+          <rect x="1" y="2" width="2" height="1"/><rect x="5" y="2" width="2" height="1"/>
+          <rect x="0" y="3" width="8" height="1"/><rect x="0" y="4" width="8" height="1"/>
+          <rect x="1" y="5" width="6" height="1"/><rect x="2" y="6" width="4" height="1"/>
+          <rect x="3" y="7" width="2" height="1"/>
+        </svg>
+        <svg class="ai-zombie-game-heart-{{ ai_gen_id }}" viewBox="0 0 8 8" fill="{{ block.settings.heart_color }}">
+          <rect x="1" y="2" width="2" height="1"/><rect x="5" y="2" width="2" height="1"/>
+          <rect x="0" y="3" width="8" height="1"/><rect x="0" y="4" width="8" height="1"/>
+          <rect x="1" y="5" width="6" height="1"/><rect x="2" y="6" width="4" height="1"/>
+          <rect x="3" y="7" width="2" height="1"/>
+        </svg>
+        <svg class="ai-zombie-game-heart-{{ ai_gen_id }}" viewBox="0 0 8 8" fill="{{ block.settings.heart_color }}">
+          <rect x="1" y="2" width="2" height="1"/><rect x="5" y="2" width="2" height="1"/>
+          <rect x="0" y="3" width="8" height="1"/><rect x="0" y="4" width="8" height="1"/>
+          <rect x="1" y="5" width="6" height="1"/><rect x="2" y="6" width="4" height="1"/>
+          <rect x="3" y="7" width="2" height="1"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="ai-zombie-game-overlay-{{ ai_gen_id }} start-screen">
+      <div class="ai-zombie-game-title-{{ ai_gen_id }}">{{ block.settings.game_title }}</div>
+      <button class="ai-zombie-game-button-{{ ai_gen_id }} start-btn">{{ block.settings.start_button_text }}</button>
+    </div>
+
+    <div class="ai-zombie-game-overlay-{{ ai_gen_id }} gameover-screen hidden">
+      <div class="ai-zombie-game-gameover-{{ ai_gen_id }}">{{ block.settings.gameover_text }}</div>
+      <div class="ai-zombie-game-final-score-{{ ai_gen_id }}">FINAL SCORE: <span class="final-score-value">0</span></div>
+      <div class="ai-zombie-game-high-score-{{ ai_gen_id }}">HIGH SCORE: <span class="high-score-value">0</span></div>
+      <button class="ai-zombie-game-button-{{ ai_gen_id }} restart-btn">{{ block.settings.restart_button_text }}</button>
+    </div>
+
+    <div class="ai-zombie-game-controls-{{ ai_gen_id }}">
+      <button class="ai-zombie-game-control-btn-{{ ai_gen_id }} sound-toggle">SOUND: <span class="sound-status">ON</span></button>
+    </div>
+  </zombie-shooter-{{ ai_gen_id }}>
+</div>
+
+<script>
+(function() {
+  class ZombieShooter{{ ai_gen_id }} extends HTMLElement {
+    constructor() {
+      super();
+      this.canvas = this.querySelector('.ai-zombie-game-canvas-{{ ai_gen_id }}');
+      this.ctx = this.canvas.getContext('2d');
+      this.startScreen = this.querySelector('.start-screen');
+      this.gameoverScreen = this.querySelector('.gameover-screen');
+      this.scoreDisplay = this.querySelector('.score-value');
+      this.finalScoreDisplay = this.querySelector('.final-score-value');
+      this.highScoreDisplay = this.querySelectorAll('.high-score-value');
+      this.heartsDisplay = this.querySelectorAll('.ai-zombie-game-heart-{{ ai_gen_id }}');
+      this.soundToggle = this.querySelector('.sound-toggle');
+      this.soundStatus = this.querySelector('.sound-status');
+      
+      this.gameState = 'start';
+      this.score = 0;
+      this.lives = {{ block.settings.player_lives }};
+      this.player = { x: 80, y: 250, width: 40, height: 60, speed: {{ block.settings.player_speed }} };
+      this.bullets = [];
+      this.zombies = [];
+      this.particles = [];
+      this.keys = {};
+      this.lastSpawn = 0;
+      this.spawnRate = {{ block.settings.initial_spawn_rate }};
+      this.difficulty = 1;
+      this.soundEnabled = this.dataset.soundEnabled === 'true';
+      
+      this.soundSettings = {
+        shoot: {
+          freq: parseFloat(this.dataset.shootFreq),
+          duration: parseFloat(this.dataset.shootDuration),
+          volume: parseFloat(this.dataset.shootVolume)
+        },
+        explode: {
+          freq: parseFloat(this.dataset.explodeFreq),
+          duration: parseFloat(this.dataset.explodeDuration),
+          volume: parseFloat(this.dataset.explodeVolume)
+        },
+        groan: {
+          freq: parseFloat(this.dataset.groanFreq),
+          duration: parseFloat(this.dataset.groanDuration),
+          volume: parseFloat(this.dataset.groanVolume)
+        }
+      };
+      
+      this.highScore = parseInt(localStorage.getItem('zombie-game-high-score-{{ ai_gen_id }}') || '0');
+      
+      this.touchStartY = 0;
+      this.isMobile = 'ontouchstart' in window;
+    }
+
+    connectedCallback() {
+      this.setupEventListeners();
+      this.updateHighScoreDisplay();
+      this.soundStatus.textContent = this.soundEnabled ? 'ON' : 'OFF';
+    }
+
+    setupEventListeners() {
+      this.querySelector('.start-btn').addEventListener('click', () => this.startGame());
+      this.querySelector('.restart-btn').addEventListener('click', () => this.startGame());
+      
+      document.addEventListener('keydown', (e) => {
+        this.keys[e.key] = true;
+        if (this.gameState === 'playing' && e.key === ' ') {
+          e.preventDefault();
+          this.shoot();
+        }
+      });
+      
+      document.addEventListener('keyup', (e) => {
+        this.keys[e.key] = false;
+      });
+      
+      this.canvas.addEventListener('click', () => {
+        if (this.gameState === 'playing') {
+          this.shoot();
+        }
+      });
+      
+      this.canvas.addEventListener('touchstart', (e) => {
+        if (this.gameState === 'playing') {
+          this.touchStartY = e.touches[0].clientY;
+        }
+      });
+      
+      this.canvas.addEventListener('touchmove', (e) => {
+        if (this.gameState === 'playing') {
+          e.preventDefault();
+          const touchY = e.touches[0].clientY;
+          const deltaY = touchY - this.touchStartY;
+          this.player.y += deltaY * 0.5;
+          this.touchStartY = touchY;
+          this.player.y = Math.max(0, Math.min(this.canvas.height - this.player.height, this.player.y));
+        }
+      });
+      
+      this.canvas.addEventListener('touchend', () => {
+        if (this.gameState === 'playing') {
+          this.shoot();
+        }
+      });
+      
+      this.soundToggle.addEventListener('click', () => {
+        this.soundEnabled = !this.soundEnabled;
+        this.soundStatus.textContent = this.soundEnabled ? 'ON' : 'OFF';
+      });
+    }
+
+    startGame() {
+      this.gameState = 'playing';
+      this.score = 0;
+      this.lives = {{ block.settings.player_lives }};
+      this.player.y = 250;
+      this.bullets = [];
+      this.zombies = [];
+      this.particles = [];
+      this.lastSpawn = Date.now();
+      this.spawnRate = {{ block.settings.initial_spawn_rate }};
+      this.difficulty = 1;
+      
+      this.startScreen.classList.add('hidden');
+      this.gameoverScreen.classList.add('hidden');
+      this.updateScore();
+      this.updateLives();
+      
+      this.gameLoop();
+    }
+
+    shoot() {
+      this.bullets.push({
+        x: this.player.x + this.player.width,
+        y: this.player.y + this.player.height / 2 - 3,
+        width: 14,
+        height: 6,
+        speed: {{ block.settings.bullet_speed }}
+      });
+      
+      this.createMuzzleFlash();
+      this.playSound('shoot');
+    }
+
+    createMuzzleFlash() {
+      for (let i = 0; i < 10; i++) {
+        this.particles.push({
+          x: this.player.x + this.player.width,
+          y: this.player.y + this.player.height / 2,
+          vx: Math.random() * 6 + 3,
+          vy: (Math.random() - 0.5) * 6,
+          life: 15,
+          color: i % 3 === 0 ? '#ffff00' : (i % 3 === 1 ? '#ff6600' : '#ff0000'),
+          size: Math.random() * 4 + 2
+        });
+      }
+    }
+
+    createBloodSplatter(x, y) {
+      for (let i = 0; i < 25; i++) {
+        this.particles.push({
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 10,
+          vy: (Math.random() - 0.5) * 10,
+          life: 50,
+          color: i % 4 === 0 ? '#cc0000' : (i % 4 === 1 ? '#990000' : (i % 4 === 2 ? '#660000' : '#330000')),
+          size: Math.random() * 5 + 2
+        });
+      }
+    }
+
+    spawnZombie() {
+      const isFat = Math.random() < 0.15;
+      this.zombies.push({
+        x: this.canvas.width,
+        y: Math.random() * (this.canvas.height - 80),
+        width: isFat ? 60 : 45,
+        height: 75,
+        speed: isFat ? Math.min({{ block.settings.zombie_speed }} + this.difficulty * 0.3, {{ block.settings.max_zombie_speed }}) : Math.min({{ block.settings.zombie_speed }} * 0.5 + this.difficulty * 0.2, {{ block.settings.max_zombie_speed }} * 0.7),
+        health: isFat ? 3 : 1,
+        isFat: isFat,
+        walkFrame: 0,
+        jawOpen: 0
+      });
+    }
+
+    updateDifficulty() {
+      this.difficulty = Math.min(1 + this.score / 500, 5);
+      this.spawnRate = Math.max({{ block.settings.min_spawn_rate }}, {{ block.settings.initial_spawn_rate }} - this.score * 2);
+    }
+
+    gameLoop() {
+      if (this.gameState !== 'playing') return;
+      
+      this.update();
+      this.draw();
+      
+      requestAnimationFrame(() => this.gameLoop());
+    }
+
+    update() {
+      if (this.keys['ArrowUp'] || this.keys['w']) {
+        this.player.y -= this.player.speed;
+      }
+      if (this.keys['ArrowDown'] || this.keys['s']) {
+        this.player.y += this.player.speed;
+      }
+      
+      this.player.y = Math.max(0, Math.min(this.canvas.height - this.player.height, this.player.y));
+      
+      this.bullets = this.bullets.filter(bullet => {
+        bullet.x += bullet.speed;
+        return bullet.x < this.canvas.width;
+      });
+      
+      this.zombies.forEach((zombie, zIndex) => {
+        zombie.x -= zombie.speed;
+        zombie.walkFrame += zombie.speed * 0.15;
+        zombie.jawOpen = Math.sin(zombie.walkFrame * 0.5) * 3;
+        
+        if (zombie.x + zombie.width < 0) {
+          this.loseLife();
+          this.zombies.splice(zIndex, 1);
+        }
+        
+        if (this.checkCollision(this.player, zombie)) {
+          this.loseLife();
+          this.zombies.splice(zIndex, 1);
+          this.createBloodSplatter(zombie.x, zombie.y + zombie.height / 2);
+        }
+        
+        this.bullets.forEach((bullet, bIndex) => {
+          if (this.checkCollision(bullet, zombie)) {
+            zombie.health--;
+            this.bullets.splice(bIndex, 1);
+            this.createBloodSplatter(zombie.x, zombie.y + zombie.height / 2);
+            
+            if (zombie.health <= 0) {
+              this.zombies.splice(zIndex, 1);
+              this.score += zombie.isFat ? 20 : 10;
+              this.updateScore();
+              this.updateDifficulty();
+              this.playSound('explode');
+            }
+          }
+        });
+      });
+      
+      this.particles = this.particles.filter(particle => {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.vy += 0.25;
+        particle.life--;
+        return particle.life > 0;
+      });
+      
+      const now = Date.now();
+      if (now - this.lastSpawn > this.spawnRate) {
+        this.spawnZombie();
+        this.lastSpawn = now;
+        this.playSound('groan');
+      }
+    }
+
+    draw() {
+      this.ctx.fillStyle = '{{ block.settings.game_bg_color }}';
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      
+      this.ctx.fillStyle = '{{ block.settings.ground_color }}';
+      this.ctx.fillRect(0, this.canvas.height - 80, this.canvas.width, 80);
+      
+      this.drawPlayer();
+      
+      this.bullets.forEach(bullet => {
+        this.ctx.fillStyle = '{{ block.settings.bullet_color }}';
+        this.ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+        this.ctx.fillStyle = '#ff3300';
+        this.ctx.fillRect(bullet.x + 3, bullet.y + 1, bullet.width - 6, bullet.height - 2);
+      });
+      
+      this.zombies.forEach(zombie => {
+        this.drawZombie(zombie);
+      });
+      
+      this.particles.forEach(particle => {
+        this.ctx.fillStyle = particle.color;
+        this.ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
+      });
+    }
+
+    drawPlayer() {
+      const p = this.player;
+      
+      this.ctx.fillStyle = '#8b4513';
+      this.ctx.fillRect(p.x + 12, p.y + 6, 16, 14);
+      this.ctx.fillStyle = '#654321';
+      this.ctx.fillRect(p.x + 14, p.y + 8, 4, 10);
+      this.ctx.fillRect(p.x + 20, p.y + 8, 4, 10);
+      this.ctx.fillRect(p.x + 10, p.y + 16, 4, 4);
+      this.ctx.fillRect(p.x + 26, p.y + 16, 4, 4);
+      
+      this.ctx.fillStyle = '#ffdbac';
+      this.ctx.fillRect(p.x + 13, p.y + 20, 14, 12);
+      this.ctx.fillStyle = '#000000';
+      this.ctx.fillRect(p.x + 16, p.y + 24, 2, 2);
+      this.ctx.fillRect(p.x + 22, p.y + 24, 2, 2);
+      this.ctx.fillStyle = '#8b0000';
+      this.ctx.fillRect(p.x + 17, p.y + 28, 6, 2);
+      
+      this.ctx.fillStyle = '#2f4f2f';
+      this.ctx.fillRect(p.x + 10, p.y + 32, 20, 18);
+      this.ctx.fillStyle = '#1a2f1a';
+      this.ctx.fillRect(p.x + 12, p.y + 34, 4, 14);
+      this.ctx.fillRect(p.x + 24, p.y + 34, 4, 14);
+      this.ctx.fillRect(p.x + 14, p.y + 36, 12, 2);
+      this.ctx.fillRect(p.x + 14, p.y + 42, 12, 2);
+      
+      this.ctx.fillStyle = '#8b7355';
+      this.ctx.fillRect(p.x + 8, p.y + 34, 4, 3);
+      this.ctx.fillRect(p.x + 28, p.y + 34, 4, 3);
+      
+      this.ctx.fillStyle = '#ffdbac';
+      this.ctx.fillRect(p.x + 6, p.y + 37, 6, 8);
+      this.ctx.fillRect(p.x + 28, p.y + 37, 6, 8);
+      
+      this.ctx.fillStyle = '#654321';
+      this.ctx.fillRect(p.x + 12, p.y + 50, 7, 10);
+      this.ctx.fillRect(p.x + 21, p.y + 50, 7, 10);
+      
+      this.ctx.fillStyle = '#4a4a4a';
+      this.ctx.fillRect(p.x + 12, p.y + 58, 7, 2);
+      this.ctx.fillRect(p.x + 21, p.y + 58, 7, 2);
+      
+      this.ctx.fillStyle = '#8b7355';
+      this.ctx.fillRect(p.x + 16, p.y + 32, 8, 4);
+      
+      this.ctx.fillStyle = '#4a4a4a';
+      this.ctx.fillRect(p.x + 30, p.y + 38, 6, 3);
+      this.ctx.fillStyle = '#2a2a2a';
+      this.ctx.fillRect(p.x + 36, p.y + 38, 2, 3);
+    }
+
+    drawZombie(zombie) {
+      const z = zombie;
+      const legOffset = Math.sin(z.walkFrame) * 4;
+      const bodyColor = zombie.isFat ? '{{ block.settings.zombie_body_color }}' : '{{ block.settings.zombie_body_color }}';
+      const darkColor = zombie.isFat ? '#0a2a0a' : '#1a3a1a';
+      const jawOffset = Math.floor(zombie.jawOpen);
+      
+      this.ctx.fillStyle = bodyColor;
+      this.ctx.fillRect(z.x + (zombie.isFat ? 15 : 12), z.y + 20, zombie.isFat ? 30 : 21, zombie.isFat ? 35 : 28);
+      
+      this.ctx.fillStyle = '#990000';
+      this.ctx.fillRect(z.x + (zombie.isFat ? 18 : 15), z.y + 24, zombie.isFat ? 5 : 4, zombie.isFat ? 10 : 8);
+      this.ctx.fillRect(z.x + (zombie.isFat ? 37 : 28), z.y + 24, zombie.isFat ? 5 : 4, zombie.isFat ? 10 : 8);
+      this.ctx.fillStyle = '#660000';
+      this.ctx.fillRect(z.x + (zombie.isFat ? 19 : 16), z.y + 26, zombie.isFat ? 3 : 2, zombie.isFat ? 6 : 5);
+      this.ctx.fillRect(z.x + (zombie.isFat ? 38 : 29), z.y + 26, zombie.isFat ? 3 : 2, zombie.isFat ? 6 : 5);
+      
+      this.ctx.fillStyle = darkColor;
+      this.ctx.fillRect(z.x + (zombie.isFat ? 17 : 14), z.y + 22, zombie.isFat ? 6 : 4, zombie.isFat ? 31 : 24);
+      this.ctx.fillRect(z.x + (zombie.isFat ? 37 : 29), z.y + 22, zombie.isFat ? 6 : 4, zombie.isFat ? 31 : 24);
+      
+      this.ctx.fillStyle = '#3a5a3a';
+      this.ctx.fillRect(z.x + (zombie.isFat ? 18 : 14), z.y + 8, zombie.isFat ? 24 : 18, zombie.isFat ? 16 : 13);
+      
+      this.ctx.fillStyle = bodyColor;
+      this.ctx.fillRect(z.x + (zombie.isFat ? 20 : 16), z.y + 10, zombie.isFat ? 20 : 14, zombie.isFat ? 12 : 9);
+      
+      this.ctx.fillStyle = '#0a0a0a';
+      this.ctx.fillRect(z.x + (zombie.isFat ? 19 : 15), z.y + 12, zombie.isFat ? 9 : 7, zombie.isFat ? 8 : 7);
+      this.ctx.fillRect(z.x + (zombie.isFat ? 32 : 24), z.y + 12, zombie.isFat ? 9 : 7, zombie.isFat ? 8 : 7);
+      
+      this.ctx.fillStyle = '{{ block.settings.zombie_eye_color }}';
+      this.ctx.fillRect(z.x + (zombie.isFat ? 22 : 18), z.y + 15, 5, 5);
+      this.ctx.fillRect(z.x + (zombie.isFat ? 34 : 26), z.y + 15, 5, 5);
+      this.ctx.fillStyle = '#ffff00';
+      this.ctx.fillRect(z.x + (zombie.isFat ? 24 : 20), z.y + 17, 1, 1);
+      this.ctx.fillRect(z.x + (zombie.isFat ? 36 : 28), z.y + 17, 1, 1);
+      
+      this.ctx.fillStyle = '#000000';
+      this.ctx.fillRect(z.x + (zombie.isFat ? 26 : 21), z.y + 20 + jawOffset, zombie.isFat ? 8 : 6, 4 + jawOffset);
+      this.ctx.fillStyle = '#660000';
+      this.ctx.fillRect(z.x + (zombie.isFat ? 27 : 22), z.y + 21 + jawOffset, zombie.isFat ? 6 : 4, 2 + jawOffset);
+      
+      this.ctx.fillStyle = '#cccccc';
+      this.ctx.fillRect(z.x + (zombie.isFat ? 27 : 22), z.y + 20, zombie.isFat ? 2 : 1, 2);
+      this.ctx.fillRect(z.x + (zombie.isFat ? 30 : 24), z.y + 20, zombie.isFat ? 2 : 1, 2);
+      this.ctx.fillRect(z.x + (zombie.isFat ? 27 : 22), z.y + 22 + jawOffset, zombie.isFat ? 2 : 1, 2);
+      this.ctx.fillRect(z.x + (zombie.isFat ? 30 : 24), z.y + 22 + jawOffset, zombie.isFat ? 2 : 1, 2);
+      
+      this.ctx.fillStyle = bodyColor;
+      this.ctx.fillRect(z.x + (zombie.isFat ? 10 : 8), z.y + 30, zombie.isFat ? 10 : 8, zombie.isFat ? 18 : 15);
+      this.ctx.fillRect(z.x + (zombie.isFat ? 40 : 29), z.y + 30, zombie.isFat ? 10 : 8, zombie.isFat ? 18 : 15);
+      
+      this.ctx.fillStyle = '#990000';
+      this.ctx.fillRect(z.x + (zombie.isFat ? 11 : 9), z.y + 34, zombie.isFat ? 4 : 3, zombie.isFat ? 6 : 5);
+      this.ctx.fillRect(z.x + (zombie.isFat ? 41 : 30), z.y + 34, zombie.isFat ? 4 : 3, zombie.isFat ? 6 : 5);
+      
+      this.ctx.fillStyle = '#cccccc';
+      this.ctx.fillRect(z.x + (zombie.isFat ? 12 : 10), z.y + 36, zombie.isFat ? 2 : 1, 2);
+      this.ctx.fillRect(z.x + (zombie.isFat ? 42 : 31), z.y + 36, zombie.isFat ? 2 : 1, 2);
+      
+      this.ctx.fillStyle = bodyColor;
+      this.ctx.fillRect(z.x + (zombie.isFat ? 15 : 12), z.y + 55 + legOffset, zombie.isFat ? 12 : 9, 20);
+      this.ctx.fillRect(z.x + (zombie.isFat ? 33 : 24), z.y + 55 - legOffset, zombie.isFat ? 12 : 9, 20);
+      
+      this.ctx.fillStyle = '#0a0a0a';
+      this.ctx.fillRect(z.x + (zombie.isFat ? 15 : 12), z.y + 73 + legOffset, zombie.isFat ? 12 : 9, 2);
+      this.ctx.fillRect(z.x + (zombie.isFat ? 33 : 24), z.y + 73 - legOffset, zombie.isFat ? 12 : 9, 2);
+    }
+
+    checkCollision(rect1, rect2) {
+      return rect1.x < rect2.x + rect2.width &&
+             rect1.x + rect1.width > rect2.x &&
+             rect1.y < rect2.y + rect2.height &&
+             rect1.y + rect1.height > rect2.y;
+    }
+
+    loseLife() {
+      this.lives--;
+      this.updateLives();
+      
+      if (this.lives <= 0) {
+        this.gameOver();
+      }
+    }
+
+    updateScore() {
+      this.scoreDisplay.textContent = this.score;
+    }
+
+    updateLives() {
+      this.heartsDisplay.forEach((heart, index) => {
+        heart.style.opacity = index < this.lives ? '1' : '0.2';
+      });
+    }
+
+    updateHighScoreDisplay() {
+      this.highScoreDisplay.forEach(display => {
+        display.textContent = this.highScore;
+      });
+    }
+
+    gameOver() {
+      this.gameState = 'gameover';
+      
+      if (this.score > this.highScore) {
+        this.highScore = this.score;
+        localStorage.setItem('zombie-game-high-score-{{ ai_gen_id }}', this.highScore.toString());
+      }
+      
+      this.finalScoreDisplay.textContent = this.score;
+      this.updateHighScoreDisplay();
+      this.gameoverScreen.classList.remove('hidden');
+    }
+
+    playSound(type) {
+      if (!this.soundEnabled) return;
+      
+      const settings = this.soundSettings[type];
+      if (!settings) return;
+      
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      if (type === 'shoot') {
+        oscillator.frequency.value = settings.freq;
+        gainNode.gain.setValueAtTime(settings.volume, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + settings.duration);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + settings.duration);
+      } else if (type === 'explode') {
+        oscillator.type = 'square';
+        oscillator.frequency.value = settings.freq;
+        gainNode.gain.setValueAtTime(settings.volume, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + settings.duration);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + settings.duration);
+      } else if (type === 'groan') {
+        oscillator.type = 'sawtooth';
+        oscillator.frequency.value = settings.freq;
+        gainNode.gain.setValueAtTime(settings.volume, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + settings.duration);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + settings.duration);
+      }
+    }
+  }
+
+  customElements.define('zombie-shooter-{{ ai_gen_id }}', ZombieShooter{{ ai_gen_id }});
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Night of the Dead",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Game settings"
+    },
+    {
+      "type": "text",
+      "id": "game_title",
+      "label": "Game title",
+      "default": "NIGHT OF THE DEAD"
+    },
+    {
+      "type": "range",
+      "id": "game_width",
+      "min": 400,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "label": "Game width",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "game_height",
+      "min": 400,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "label": "Game height",
+      "default": 600
+    },
+    {
+      "type": "header",
+      "content": "Player settings"
+    },
+    {
+      "type": "range",
+      "id": "player_lives",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "label": "Player lives",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "player_speed",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "label": "Player speed",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "bullet_speed",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "label": "Bullet speed",
+      "default": 13
+    },
+    {
+      "type": "header",
+      "content": "Zombie settings"
+    },
+    {
+      "type": "range",
+      "id": "zombie_speed",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "label": "Zombie speed",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "max_zombie_speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "label": "Max zombie speed",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "initial_spawn_rate",
+      "min": 1000,
+      "max": 3000,
+      "step": 100,
+      "unit": "ms",
+      "label": "Initial spawn rate",
+      "default": 2000
+    },
+    {
+      "type": "range",
+      "id": "min_spawn_rate",
+      "min": 500,
+      "max": 1500,
+      "step": 100,
+      "unit": "ms",
+      "label": "Min spawn rate",
+      "default": 800
+    },
+    {
+      "type": "header",
+      "content": "Sound effects"
+    },
+    {
+      "type": "checkbox",
+      "id": "sound_enabled",
+      "label": "Enable sound by default",
+      "default": true
+    },
+    {
+      "type": "paragraph",
+      "content": "Shoot sound"
+    },
+    {
+      "type": "range",
+      "id": "shoot_sound_freq",
+      "min": 400,
+      "max": 1200,
+      "step": 50,
+      "unit": "Hz",
+      "label": "Frequency",
+      "default": 900
+    },
+    {
+      "type": "range",
+      "id": "shoot_sound_duration",
+      "min": 0,
+      "max": 0.5,
+      "step": 0.1,
+      "unit": "s",
+      "label": "Duration",
+      "default": 0.1
+    },
+    {
+      "type": "range",
+      "id": "shoot_sound_volume",
+      "min": 0,
+      "max": 0.5,
+      "step": 0.1,
+      "label": "Volume",
+      "default": 0.3
+    },
+    {
+      "type": "paragraph",
+      "content": "Explode sound"
+    },
+    {
+      "type": "range",
+      "id": "explode_sound_freq",
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "unit": "Hz",
+      "label": "Frequency",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "explode_sound_duration",
+      "min": 0,
+      "max": 0.5,
+      "step": 0.1,
+      "unit": "s",
+      "label": "Duration",
+      "default": 0.3
+    },
+    {
+      "type": "range",
+      "id": "explode_sound_volume",
+      "min": 0,
+      "max": 0.5,
+      "step": 0.1,
+      "label": "Volume",
+      "default": 0.4
+    },
+    {
+      "type": "paragraph",
+      "content": "Groan sound"
+    },
+    {
+      "type": "range",
+      "id": "groan_sound_freq",
+      "min": 50,
+      "max": 200,
+      "step": 10,
+      "unit": "Hz",
+      "label": "Frequency",
+      "default": 90
+    },
+    {
+      "type": "range",
+      "id": "groan_sound_duration",
+      "min": 0,
+      "max": 0.5,
+      "step": 0.1,
+      "unit": "s",
+      "label": "Duration",
+      "default": 0.4
+    },
+    {
+      "type": "range",
+      "id": "groan_sound_volume",
+      "min": 0,
+      "max": 0.5,
+      "step": 0.1,
+      "label": "Volume",
+      "default": 0.1
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "game_bg_color",
+      "label": "Game background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "ground_color",
+      "label": "Ground",
+      "default": "#0a0a0a"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border",
+      "default": "#660000"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 2,
+      "max": 12,
+      "step": 2,
+      "unit": "px",
+      "label": "Border width",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "score_color",
+      "label": "Score",
+      "default": "#ff0000"
+    },
+    {
+      "type": "color",
+      "id": "heart_color",
+      "label": "Heart",
+      "default": "#cc0000"
+    },
+    {
+      "type": "color",
+      "id": "bullet_color",
+      "label": "Bullet",
+      "default": "#ffff00"
+    },
+    {
+      "type": "color",
+      "id": "zombie_body_color",
+      "label": "Zombie body",
+      "default": "#2a4a2a"
+    },
+    {
+      "type": "color",
+      "id": "zombie_eye_color",
+      "label": "Zombie eyes",
+      "default": "#ff0000"
+    },
+    {
+      "type": "header",
+      "content": "Text settings"
+    },
+    {
+      "type": "text",
+      "id": "start_button_text",
+      "label": "Start button text",
+      "default": "START GAME"
+    },
+    {
+      "type": "text",
+      "id": "restart_button_text",
+      "label": "Restart button text",
+      "default": "START OVER"
+    },
+    {
+      "type": "text",
+      "id": "gameover_text",
+      "label": "Game over text",
+      "default": "YOU ARE DEAD"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#cc0000"
+    },
+    {
+      "type": "color",
+      "id": "title_shadow_color",
+      "label": "Title shadow",
+      "default": "#660000"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "min": 24,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Title font size",
+      "default": 42
+    },
+    {
+      "type": "color",
+      "id": "gameover_color",
+      "label": "Game over color",
+      "default": "#990000"
+    },
+    {
+      "type": "range",
+      "id": "gameover_font_size",
+      "min": 32,
+      "max": 72,
+      "step": 4,
+      "unit": "px",
+      "label": "Game over font size",
+      "default": 52
+    },
+    {
+      "type": "color",
+      "id": "highscore_color",
+      "label": "High score color",
+      "default": "#ffcc00"
+    },
+    {
+      "type": "range",
+      "id": "ui_font_size",
+      "min": 12,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "UI font size",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Button colors"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button background",
+      "default": "#990000"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_color",
+      "label": "Button hover",
+      "default": "#bb0000"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Button border",
+      "default": "#cc0000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "control_text_color",
+      "label": "Control text",
+      "default": "#ff0000"
+    },
+    {
+      "type": "color",
+      "id": "control_border_color",
+      "label": "Control border",
+      "default": "#cc0000"
+    },
+    {
+      "type": "header",
+      "content": "Visual effects"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scanlines",
+      "label": "Show scanlines",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "contrast",
+      "min": 1,
+      "max": 1.5,
+      "step": 0.1,
+      "label": "Contrast",
+      "default": 1.2
+    },
+    {
+      "type": "range",
+      "id": "brightness",
+      "min": 0.5,
+      "max": 1,
+      "step": 0.1,
+      "label": "Brightness",
+      "default": 0.9
+    }
+  ],
+  "presets": [
+    {
+      "name": "Night of the Dead"
+    }
+  ]
+}
+{% endschema %}

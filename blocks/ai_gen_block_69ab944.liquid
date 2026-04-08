@@ -1,0 +1,841 @@
+{% doc %}
+  @prompt
+    add a section like a 80s ad advertising the games section of the website, make it more uncanny and retro, make it more uncanny and minimal, add a image slide slot and make the color scheme red and give it a haunted bloody arcade like style , ok just like that now make it more 8bit arcade like , more horror like. , no make it look like a section that redirects to a game page. like a ad on a old nintendo magazine but with the horror uncanny touch
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-retro-ad-{{ ai_gen_id }} {
+    position: relative;
+    padding: 60px 20px;
+    background: {{ block.settings.background_color }};
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+  }
+
+  .ai-retro-ad-container-{{ ai_gen_id }} {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    background: {{ block.settings.page_bg }};
+    border: 12px solid {{ block.settings.border_color }};
+    box-shadow: 
+      0 0 0 4px {{ block.settings.border_inner }},
+      inset 0 0 60px {{ block.settings.inner_shadow }},
+      0 20px 40px rgba(0, 0, 0, 0.8);
+    padding: 40px;
+    z-index: 2;
+  }
+
+  .ai-retro-ad-badge-{{ ai_gen_id }} {
+    position: absolute;
+    top: -15px;
+    right: 40px;
+    background: {{ block.settings.badge_bg }};
+    color: {{ block.settings.badge_text_color }};
+    padding: 8px 24px;
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    border: 4px solid {{ block.settings.badge_border }};
+    box-shadow: 4px 4px 0 {{ block.settings.badge_shadow }};
+    transform: rotate(-3deg);
+    z-index: 3;
+  }
+
+  .ai-retro-ad-logo-{{ ai_gen_id }} {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .ai-retro-ad-headline-{{ ai_gen_id }} {
+    font-size: {{ block.settings.headline_size }}px;
+    font-weight: 900;
+    color: {{ block.settings.headline_color }};
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin: 0;
+    line-height: 1;
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    text-shadow: 
+      4px 4px 0 {{ block.settings.headline_shadow }};
+    text-align: center;
+  }
+
+  .ai-retro-ad-tagline-{{ ai_gen_id }} {
+    font-size: {{ block.settings.tagline_size }}px;
+    color: {{ block.settings.tagline_color }};
+    text-align: center;
+    margin: 10px 0 0;
+    font-style: italic;
+    letter-spacing: 1px;
+  }
+
+  .ai-retro-ad-content-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin: 30px 0;
+  }
+
+  .ai-retro-ad-image-section-{{ ai_gen_id }} {
+    position: relative;
+  }
+
+  .ai-retro-ad-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    border: 6px solid {{ block.settings.image_border }};
+    box-shadow: 
+      0 0 0 2px {{ block.settings.image_border_inner }},
+      8px 8px 0 {{ block.settings.image_shadow }},
+      0 0 30px {{ block.settings.image_glow }};
+    overflow: hidden;
+    background: #000000;
+  }
+
+  .ai-retro-ad-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: contrast({{ block.settings.image_contrast }}%) saturate({{ block.settings.image_saturation }}%);
+  }
+
+  .ai-retro-ad-image-placeholder-{{ ai_gen_id }} {
+    background-color: #0a0000;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-retro-ad-image-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    opacity: 0.2;
+  }
+
+  .ai-retro-ad-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 16px;
+    font-size: 12px;
+    color: {{ block.settings.headline_color }};
+    text-align: center;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .ai-retro-ad-screenshot-label-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: {{ block.settings.label_bg }};
+    color: {{ block.settings.label_text }};
+    padding: 4px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border: 2px solid {{ block.settings.label_border }};
+    white-space: nowrap;
+  }
+
+  .ai-retro-ad-info-section-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .ai-retro-ad-description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.description_size }}px;
+    color: {{ block.settings.description_color }};
+    line-height: 1.6;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .ai-retro-ad-features-{{ ai_gen_id }} {
+    margin-bottom: 20px;
+  }
+
+  .ai-retro-ad-features-title-{{ ai_gen_id }} {
+    font-size: 16px;
+    font-weight: 900;
+    color: {{ block.settings.features_title_color }};
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0 0 12px;
+    border-bottom: 3px solid {{ block.settings.features_border }};
+    padding-bottom: 6px;
+  }
+
+  .ai-retro-ad-feature-{{ ai_gen_id }} {
+    font-size: 14px;
+    color: {{ block.settings.feature_color }};
+    margin: 8px 0;
+    padding-left: 20px;
+    position: relative;
+    letter-spacing: 0.5px;
+  }
+
+  .ai-retro-ad-feature-{{ ai_gen_id }}::before {
+    content: '▶';
+    position: absolute;
+    left: 0;
+    color: {{ block.settings.bullet_color }};
+    font-size: 10px;
+  }
+
+  .ai-retro-ad-cta-section-{{ ai_gen_id }} {
+    text-align: center;
+    margin-top: auto;
+  }
+
+  .ai-retro-ad-button-{{ ai_gen_id }} {
+    display: inline-block;
+    padding: 18px 50px;
+    background: {{ block.settings.button_color }};
+    color: {{ block.settings.button_text_color }};
+    font-size: {{ block.settings.button_size }}px;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 3px;
+    border: 5px solid {{ block.settings.button_border }};
+    box-shadow: 
+      8px 8px 0 {{ block.settings.button_shadow }},
+      0 0 30px {{ block.settings.button_glow }};
+    transition: all 0.1s ease;
+    font-family: 'Impact', 'Arial Black', sans-serif;
+  }
+
+  .ai-retro-ad-button-{{ ai_gen_id }}:hover {
+    transform: translate(4px, 4px);
+    box-shadow: 
+      4px 4px 0 {{ block.settings.button_shadow }},
+      0 0 40px {{ block.settings.button_glow }};
+  }
+
+  .ai-retro-ad-button-{{ ai_gen_id }}:active {
+    transform: translate(8px, 8px);
+    box-shadow: 
+      0 0 0 {{ block.settings.button_shadow }},
+      0 0 20px {{ block.settings.button_glow }};
+  }
+
+  .ai-retro-ad-warning-{{ ai_gen_id }} {
+    font-size: 11px;
+    color: {{ block.settings.warning_color }};
+    text-align: center;
+    margin-top: 12px;
+    font-style: italic;
+    letter-spacing: 0.5px;
+  }
+
+  .ai-retro-ad-blood-stain-{{ ai_gen_id }} {
+    position: absolute;
+    opacity: {{ block.settings.stain_opacity | divided_by: 100.0 }};
+    z-index: 1;
+  }
+
+  .ai-retro-ad-blood-stain-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    background: {{ block.settings.stain_color }};
+    border-radius: 50%;
+  }
+
+  .ai-retro-ad-blood-stain-{{ ai_gen_id }}:nth-child(1) { top: 5%; right: 10%; }
+  .ai-retro-ad-blood-stain-{{ ai_gen_id }}:nth-child(1)::before { width: 40px; height: 40px; }
+
+  .ai-retro-ad-blood-stain-{{ ai_gen_id }}:nth-child(2) { bottom: 8%; left: 5%; }
+  .ai-retro-ad-blood-stain-{{ ai_gen_id }}:nth-child(2)::before { width: 50px; height: 50px; }
+
+  .ai-retro-ad-scanlines-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.1) 0px,
+      rgba(0, 0, 0, 0.1) 2px,
+      transparent 2px,
+      transparent 4px
+    );
+    pointer-events: none;
+    opacity: {{ block.settings.scanline_opacity | divided_by: 100.0 }};
+    z-index: 10;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-retro-ad-container-{{ ai_gen_id }} {
+      padding: 30px 20px;
+    }
+
+    .ai-retro-ad-content-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: 25px;
+    }
+
+    .ai-retro-ad-headline-{{ ai_gen_id }} {
+      font-size: {{ block.settings.headline_size | times: 0.6 }}px;
+      letter-spacing: 2px;
+      text-shadow: 3px 3px 0 {{ block.settings.headline_shadow }};
+    }
+
+    .ai-retro-ad-tagline-{{ ai_gen_id }} {
+      font-size: {{ block.settings.tagline_size | times: 0.9 }}px;
+    }
+
+    .ai-retro-ad-description-{{ ai_gen_id }} {
+      font-size: {{ block.settings.description_size | times: 0.9 }}px;
+    }
+
+    .ai-retro-ad-button-{{ ai_gen_id }} {
+      padding: 15px 40px;
+      font-size: {{ block.settings.button_size | times: 0.9 }}px;
+      letter-spacing: 2px;
+      box-shadow: 6px 6px 0 {{ block.settings.button_shadow }}, 0 0 30px {{ block.settings.button_glow }};
+    }
+
+    .ai-retro-ad-button-{{ ai_gen_id }}:hover {
+      transform: translate(3px, 3px);
+      box-shadow: 3px 3px 0 {{ block.settings.button_shadow }}, 0 0 40px {{ block.settings.button_glow }};
+    }
+
+    .ai-retro-ad-badge-{{ ai_gen_id }} {
+      right: 20px;
+      font-size: 12px;
+      padding: 6px 16px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-retro-ad-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  {% if block.settings.show_scanlines %}
+    <div class="ai-retro-ad-scanlines-{{ ai_gen_id }}"></div>
+  {% endif %}
+
+  {% if block.settings.show_blood_stains %}
+    <div class="ai-retro-ad-blood-stain-{{ ai_gen_id }}"></div>
+    <div class="ai-retro-ad-blood-stain-{{ ai_gen_id }}"></div>
+  {% endif %}
+
+  <div class="ai-retro-ad-container-{{ ai_gen_id }}">
+    {% if block.settings.badge_label != blank %}
+      <div class="ai-retro-ad-badge-{{ ai_gen_id }}">
+        {{ block.settings.badge_label }}
+      </div>
+    {% endif %}
+
+    <div class="ai-retro-ad-logo-{{ ai_gen_id }}">
+      {% if block.settings.headline != blank %}
+        <h2 class="ai-retro-ad-headline-{{ ai_gen_id }}">
+          {{ block.settings.headline }}
+        </h2>
+      {% endif %}
+      {% if block.settings.tagline != blank %}
+        <div class="ai-retro-ad-tagline-{{ ai_gen_id }}">
+          {{ block.settings.tagline }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="ai-retro-ad-content-{{ ai_gen_id }}">
+      <div class="ai-retro-ad-image-section-{{ ai_gen_id }}">
+        <div class="ai-retro-ad-image-wrapper-{{ ai_gen_id }}">
+          {% if block.settings.image %}
+            <img
+              src="{{ block.settings.image | image_url: width: 800 }}"
+              alt="{{ block.settings.image.alt | escape }}"
+              loading="lazy"
+              width="{{ block.settings.image.width }}"
+              height="{{ block.settings.image.height }}"
+              class="ai-retro-ad-image-{{ ai_gen_id }}"
+            >
+          {% else %}
+            <div class="ai-retro-ad-image-placeholder-{{ ai_gen_id }}">
+              {{ 'product-1' | placeholder_svg_tag }}
+              <div class="ai-retro-ad-empty-state-{{ ai_gen_id }}">
+                ADD SCREENSHOT
+              </div>
+            </div>
+          {% endif %}
+        </div>
+        {% if block.settings.screenshot_label != blank %}
+          <div class="ai-retro-ad-screenshot-label-{{ ai_gen_id }}">
+            {{ block.settings.screenshot_label }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="ai-retro-ad-info-section-{{ ai_gen_id }}">
+        {% if block.settings.description != blank %}
+          <div class="ai-retro-ad-description-{{ ai_gen_id }}">
+            {{ block.settings.description }}
+          </div>
+        {% endif %}
+
+        <div class="ai-retro-ad-features-{{ ai_gen_id }}">
+          {% if block.settings.features_title != blank %}
+            <div class="ai-retro-ad-features-title-{{ ai_gen_id }}">
+              {{ block.settings.features_title }}
+            </div>
+          {% endif %}
+          {% if block.settings.feature_1 != blank %}
+            <div class="ai-retro-ad-feature-{{ ai_gen_id }}">{{ block.settings.feature_1 }}</div>
+          {% endif %}
+          {% if block.settings.feature_2 != blank %}
+            <div class="ai-retro-ad-feature-{{ ai_gen_id }}">{{ block.settings.feature_2 }}</div>
+          {% endif %}
+          {% if block.settings.feature_3 != blank %}
+            <div class="ai-retro-ad-feature-{{ ai_gen_id }}">{{ block.settings.feature_3 }}</div>
+          {% endif %}
+          {% if block.settings.feature_4 != blank %}
+            <div class="ai-retro-ad-feature-{{ ai_gen_id }}">{{ block.settings.feature_4 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="ai-retro-ad-cta-section-{{ ai_gen_id }}">
+          {% if block.settings.button_text != blank %}
+            <a href="{{ block.settings.button_link }}" class="ai-retro-ad-button-{{ ai_gen_id }}">
+              {{ block.settings.button_text }}
+            </a>
+          {% endif %}
+          {% if block.settings.warning_text != blank %}
+            <div class="ai-retro-ad-warning-{{ ai_gen_id }}">
+              {{ block.settings.warning_text }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Retro game magazine ad",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Title"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Game title",
+      "default": "NIGHTMARE ARCADE"
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "The game that plays you back"
+    },
+    {
+      "type": "text",
+      "id": "badge_label",
+      "label": "Badge text",
+      "default": "NEW RELEASE"
+    },
+    {
+      "type": "header",
+      "content": "Screenshot"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Game screenshot"
+    },
+    {
+      "type": "text",
+      "id": "screenshot_label",
+      "label": "Screenshot label",
+      "default": "ACTUAL GAME FOOTAGE"
+    },
+    {
+      "type": "header",
+      "content": "Description"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Enter a world where the pixels bleed and the high scores are written in screams. This isn't just a game—it's a portal to something darker. Are you brave enough to press start?"
+    },
+    {
+      "type": "header",
+      "content": "Features"
+    },
+    {
+      "type": "text",
+      "id": "features_title",
+      "label": "Features title",
+      "default": "GAME FEATURES"
+    },
+    {
+      "type": "text",
+      "id": "feature_1",
+      "label": "Feature 1",
+      "default": "Haunting 8-bit graphics that follow you home"
+    },
+    {
+      "type": "text",
+      "id": "feature_2",
+      "label": "Feature 2",
+      "default": "Disturbing sound effects you can't unhear"
+    },
+    {
+      "type": "text",
+      "id": "feature_3",
+      "label": "Feature 3",
+      "default": "Multiple endings (none of them good)"
+    },
+    {
+      "type": "text",
+      "id": "feature_4",
+      "label": "Feature 4",
+      "default": "Unlockable nightmares and hidden terrors"
+    },
+    {
+      "type": "header",
+      "content": "Call to action"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "PLAY NOW"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "text",
+      "id": "warning_text",
+      "label": "Warning text",
+      "default": "Warning: Not responsible for lost sleep or sanity"
+    },
+    {
+      "type": "header",
+      "content": "Title style"
+    },
+    {
+      "type": "range",
+      "id": "headline_size",
+      "min": 30,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Size",
+      "default": 50
+    },
+    {
+      "type": "color",
+      "id": "headline_color",
+      "label": "Color",
+      "default": "#DC143C"
+    },
+    {
+      "type": "color",
+      "id": "headline_shadow",
+      "label": "Shadow color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "tagline_size",
+      "min": 12,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Tagline size",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "tagline_color",
+      "label": "Tagline color",
+      "default": "#8B0000"
+    },
+    {
+      "type": "header",
+      "content": "Badge style"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg",
+      "label": "Background",
+      "default": "#FF0000"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "badge_border",
+      "label": "Border color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "badge_shadow",
+      "label": "Shadow color",
+      "default": "#8B0000"
+    },
+    {
+      "type": "header",
+      "content": "Screenshot style"
+    },
+    {
+      "type": "range",
+      "id": "image_contrast",
+      "min": 80,
+      "max": 180,
+      "step": 10,
+      "unit": "%",
+      "label": "Contrast",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "image_saturation",
+      "min": 80,
+      "max": 180,
+      "step": 10,
+      "unit": "%",
+      "label": "Saturation",
+      "default": 140
+    },
+    {
+      "type": "color",
+      "id": "image_border",
+      "label": "Border color",
+      "default": "#8B0000"
+    },
+    {
+      "type": "color",
+      "id": "image_border_inner",
+      "label": "Inner border",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "image_shadow",
+      "label": "Shadow color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "image_glow",
+      "label": "Glow color",
+      "default": "#8B0000"
+    },
+    {
+      "type": "color",
+      "id": "label_bg",
+      "label": "Label background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "label_text",
+      "label": "Label text",
+      "default": "#FF0000"
+    },
+    {
+      "type": "color",
+      "id": "label_border",
+      "label": "Label border",
+      "default": "#8B0000"
+    },
+    {
+      "type": "header",
+      "content": "Text style"
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Description size",
+      "default": 15
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description color",
+      "default": "#2B2B2B"
+    },
+    {
+      "type": "color",
+      "id": "features_title_color",
+      "label": "Features title",
+      "default": "#8B0000"
+    },
+    {
+      "type": "color",
+      "id": "features_border",
+      "label": "Features border",
+      "default": "#DC143C"
+    },
+    {
+      "type": "color",
+      "id": "feature_color",
+      "label": "Feature text",
+      "default": "#3B3B3B"
+    },
+    {
+      "type": "color",
+      "id": "bullet_color",
+      "label": "Bullet color",
+      "default": "#DC143C"
+    },
+    {
+      "type": "color",
+      "id": "warning_color",
+      "label": "Warning text",
+      "default": "#8B0000"
+    },
+    {
+      "type": "header",
+      "content": "Button style"
+    },
+    {
+      "type": "range",
+      "id": "button_size",
+      "min": 14,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Size",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Background",
+      "default": "#DC143C"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "button_border",
+      "label": "Border color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_shadow",
+      "label": "Shadow color",
+      "default": "#8B0000"
+    },
+    {
+      "type": "color",
+      "id": "button_glow",
+      "label": "Glow color",
+      "default": "#FF0000"
+    },
+    {
+      "type": "header",
+      "content": "Page style"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Outer background",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "color",
+      "id": "page_bg",
+      "label": "Page background",
+      "default": "#E8E0D5"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#8B0000"
+    },
+    {
+      "type": "color",
+      "id": "border_inner",
+      "label": "Inner border",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "inner_shadow",
+      "label": "Inner shadow",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Effects"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scanlines",
+      "label": "Show scanlines",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "scanline_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Scanline opacity",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "show_blood_stains",
+      "label": "Show blood stains",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "stain_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Stain opacity",
+      "default": 15
+    },
+    {
+      "type": "color",
+      "id": "stain_color",
+      "label": "Stain color",
+      "default": "#8B0000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Retro game magazine ad"
+    }
+  ]
+}
+{% endschema %}

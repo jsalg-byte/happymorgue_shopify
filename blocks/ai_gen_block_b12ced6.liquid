@@ -1,0 +1,1022 @@
+{% doc %}
+  @prompt
+    Create a retro 8-bit zombie shooter game called "Night of the Dead" with title displayed at top. The player is a simple blocky blonde female character like Lara Croft wearing an orange shirt, positioned on the left side, can move up and down using arrow keys or swipe on mobile. Simple pixelated full-body zombies with undead features walk from right to left. Player shoots right by clicking or tapping. Difficulty progression: start slow with easy zombie spawns, gradually increase speed and spawn rate until capped at a fair challenging speed. Occasionally spawn fat zombies that are harder to kill and move faster. Make it challenging: zombies spawn frequently at higher levels, move at different speeds, some zombies take multiple hits, player has only 3 lives shown as pixel hearts. IMPORTANT: Player dies instantly on collision with any zombie and loses a life. Include pixel muzzle flash when shooting, chunky pixel blood splatter when zombies are hit, score counter with retro font, HIGH SCORE SAVING that persists between sessions, game over screen showing current score and saved high score, restart button, simple clean 2D retro pixel art style, dark horror palette with zombie greens, blood reds, and black background, and smooth retro animations. Keep sprites very simple and blocky like classic NES games., ok make it more horror movie arcade like , take off the warning infected zone. make it heart lives. and make the player back and white stripes like a escaped prisoner, actually make it orange jumpsuit, make the zombie reaching the end count as damage. show the 3 hearts status. and make the game over more retro and dark souls like. like say you are dead. and a start over button., give me settings to customize it , give me settings to customize it 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-zombie-game-{{ ai_gen_id }} {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    background: linear-gradient(180deg, #0a0a0a 0%, #1a0a0a 100%);
+    padding: 20px;
+    font-family: 'Courier New', monospace;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    border: 6px solid {{ block.settings.border_color }};
+    box-shadow: 0 0 30px {{ block.settings.border_color | color_modify: 'alpha', 0.5 }}, inset 0 0 20px rgba(0, 0, 0, 0.8);
+  }
+
+  .ai-zombie-game-title-{{ ai_gen_id }} {
+    text-align: center;
+    color: {{ block.settings.title_color }};
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-shadow: 
+      0 0 10px {{ block.settings.title_color }},
+      0 0 20px {{ block.settings.title_color }},
+      0 0 30px {{ block.settings.title_color | color_modify: 'alpha', 0.5 }},
+      3px 3px 0 #000000;
+    letter-spacing: 3px;
+    animation: ai-zombie-flicker-{{ ai_gen_id }} 3s infinite;
+  }
+
+  .ai-zombie-game-subtitle-{{ ai_gen_id }} {
+    text-align: center;
+    color: {{ block.settings.subtitle_color }};
+    font-size: 14px;
+    margin-bottom: 15px;
+    text-shadow: 0 0 5px {{ block.settings.subtitle_color }};
+    letter-spacing: 2px;
+  }
+
+  @keyframes ai-zombie-flicker-{{ ai_gen_id }} {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.95; }
+    51% { opacity: 1; }
+    52% { opacity: 0.97; }
+    53% { opacity: 1; }
+  }
+
+  .ai-zombie-game-canvas-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    background: linear-gradient(180deg, {{ block.settings.background_color_top }} 0%, {{ block.settings.background_color_bottom }} 100%);
+    border: 4px solid {{ block.settings.canvas_border_color }};
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    cursor: crosshair;
+    box-shadow: 
+      inset 0 0 50px {{ block.settings.border_color | color_modify: 'alpha', 0.3 }},
+      0 0 20px rgba(0, 0, 0, 0.8);
+  }
+
+  .ai-zombie-game-hud-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    color: #ffffff;
+    font-size: 18px;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid {{ block.settings.border_color }};
+  }
+
+  .ai-zombie-game-score-{{ ai_gen_id }} {
+    color: {{ block.settings.score_color }};
+    text-shadow: 
+      0 0 10px {{ block.settings.score_color }},
+      2px 2px 0 #000000;
+    font-weight: bold;
+  }
+
+  .ai-zombie-game-level-{{ ai_gen_id }} {
+    color: {{ block.settings.level_color }};
+    text-shadow: 
+      0 0 8px {{ block.settings.level_color }},
+      2px 2px 0 #000000;
+    font-weight: bold;
+  }
+
+  .ai-zombie-game-lives-{{ ai_gen_id }} {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .ai-zombie-game-heart-{{ ai_gen_id }} {
+    width: 28px;
+    height: 28px;
+    background-color: {{ block.settings.heart_color }};
+    clip-path: polygon(
+      50% 20%, 60% 10%, 70% 10%, 80% 20%, 80% 40%, 
+      50% 80%, 20% 40%, 20% 20%, 30% 10%, 40% 10%
+    );
+    filter: drop-shadow(0 0 5px {{ block.settings.heart_color }});
+  }
+
+  .ai-zombie-game-heart-empty-{{ ai_gen_id }} {
+    background-color: #330000;
+    filter: drop-shadow(0 0 2px #330000);
+  }
+
+  .ai-zombie-game-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.98) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .ai-zombie-game-overlay-title-{{ ai_gen_id }} {
+    font-size: 72px;
+    color: {{ block.settings.game_over_color }};
+    margin-bottom: 30px;
+    text-shadow: 
+      0 0 30px {{ block.settings.game_over_color }},
+      0 0 60px {{ block.settings.game_over_color }},
+      5px 5px 0 #000000;
+    animation: ai-zombie-death-pulse-{{ ai_gen_id }} 3s infinite;
+    letter-spacing: 8px;
+  }
+
+  @keyframes ai-zombie-death-pulse-{{ ai_gen_id }} {
+    0%, 100% { 
+      opacity: 0.9;
+      transform: scale(1);
+    }
+    50% { 
+      opacity: 1;
+      transform: scale(1.02);
+    }
+  }
+
+  .ai-zombie-game-overlay-text-{{ ai_gen_id }} {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: #999999;
+    text-shadow: 2px 2px 0 #000000;
+  }
+
+  .ai-zombie-game-restart-btn-{{ ai_gen_id }} {
+    margin-top: 40px;
+    padding: 20px 60px;
+    font-size: 22px;
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(180deg, #1a1a1a 0%, #000000 100%);
+    color: #cccccc;
+    border: 3px solid #666666;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 0 #000000;
+    box-shadow: 
+      0 0 15px rgba(0, 0, 0, 0.9),
+      inset 0 0 10px rgba(255, 255, 255, 0.05);
+    transition: all 0.3s;
+  }
+
+  .ai-zombie-game-restart-btn-{{ ai_gen_id }}:hover {
+    background: linear-gradient(180deg, #2a2a2a 0%, #0a0a0a 100%);
+    color: #ffffff;
+    border-color: #999999;
+    box-shadow: 
+      0 0 25px rgba(255, 255, 255, 0.3),
+      inset 0 0 15px rgba(255, 255, 255, 0.1);
+  }
+
+  .ai-zombie-game-container-{{ ai_gen_id }} {
+    position: relative;
+  }
+
+  .ai-zombie-game-hidden-{{ ai_gen_id }} {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-zombie-game-title-{{ ai_gen_id }} {
+      font-size: 28px;
+    }
+
+    .ai-zombie-game-overlay-title-{{ ai_gen_id }} {
+      font-size: 48px;
+    }
+
+    .ai-zombie-game-overlay-text-{{ ai_gen_id }} {
+      font-size: 18px;
+    }
+
+    .ai-zombie-game-hud-{{ ai_gen_id }} {
+      font-size: 14px;
+    }
+
+    .ai-zombie-game-restart-btn-{{ ai_gen_id }} {
+      padding: 15px 40px;
+      font-size: 18px;
+    }
+  }
+{% endstyle %}
+
+<zombie-shooter-{{ ai_gen_id }} class="ai-zombie-game-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-zombie-game-title-{{ ai_gen_id }}">{{ block.settings.game_title }}</div>
+  <div class="ai-zombie-game-subtitle-{{ ai_gen_id }}">{{ block.settings.game_subtitle }}</div>
+  
+  <div class="ai-zombie-game-container-{{ ai_gen_id }}">
+    <canvas 
+      class="ai-zombie-game-canvas-{{ ai_gen_id }}" 
+      width="800" 
+      height="400"
+    ></canvas>
+    
+    <div class="ai-zombie-game-overlay-{{ ai_gen_id }} ai-zombie-game-hidden-{{ ai_gen_id }}" data-overlay>
+      <div class="ai-zombie-game-overlay-title-{{ ai_gen_id }}" data-overlay-title>{{ block.settings.game_over_text }}</div>
+      <div class="ai-zombie-game-overlay-text-{{ ai_gen_id }}" data-overlay-score>Score: 0</div>
+      <div class="ai-zombie-game-overlay-text-{{ ai_gen_id }}" data-overlay-highscore>High Score: 0</div>
+      <button class="ai-zombie-game-restart-btn-{{ ai_gen_id }}" data-restart>{{ block.settings.restart_button_text }}</button>
+    </div>
+  </div>
+
+  <div class="ai-zombie-game-hud-{{ ai_gen_id }}">
+    <div class="ai-zombie-game-score-{{ ai_gen_id }}" data-score>SCORE: 0</div>
+    <div class="ai-zombie-game-level-{{ ai_gen_id }}" data-level>WAVE: 1</div>
+    <div class="ai-zombie-game-lives-{{ ai_gen_id }}" data-lives>
+      <div class="ai-zombie-game-heart-{{ ai_gen_id }}"></div>
+      <div class="ai-zombie-game-heart-{{ ai_gen_id }}"></div>
+      <div class="ai-zombie-game-heart-{{ ai_gen_id }}"></div>
+    </div>
+  </div>
+</zombie-shooter-{{ ai_gen_id }}>
+
+<script>
+(function() {
+  class ZombieShooter{{ ai_gen_id }} extends HTMLElement {
+    constructor() {
+      super();
+      this.canvas = this.querySelector('.ai-zombie-game-canvas-{{ ai_gen_id }}');
+      this.ctx = this.canvas.getContext('2d');
+      this.overlay = this.querySelector('[data-overlay]');
+      this.scoreDisplay = this.querySelector('[data-score]');
+      this.levelDisplay = this.querySelector('[data-level]');
+      this.livesDisplay = this.querySelector('[data-lives]');
+      this.restartBtn = this.querySelector('[data-restart]');
+      this.overlayScore = this.querySelector('[data-overlay-score]');
+      this.overlayHighScore = this.querySelector('[data-overlay-highscore]');
+      
+      this.settings = {
+        startingLives: {{ block.settings.starting_lives }},
+        playerSpeed: {{ block.settings.player_speed }},
+        bulletSpeed: {{ block.settings.bullet_speed }},
+        initialZombieSpeed: {{ block.settings.initial_zombie_speed }},
+        initialSpawnRate: {{ block.settings.initial_spawn_rate }},
+        maxZombieSpeed: {{ block.settings.max_zombie_speed }},
+        minSpawnRate: {{ block.settings.min_spawn_rate }},
+        fatZombieChance: {{ block.settings.fat_zombie_chance }},
+        fatZombieHealth: {{ block.settings.fat_zombie_health }},
+        normalZombieHealth: {{ block.settings.normal_zombie_health }},
+        pointsPerKill: {{ block.settings.points_per_kill }},
+        pointsPerFatKill: {{ block.settings.points_per_fat_kill }},
+        playerColor: '{{ block.settings.player_color }}',
+        zombieColor: '{{ block.settings.zombie_color }}',
+        bulletColor: '{{ block.settings.bullet_color }}'
+      };
+      
+      this.gameState = {
+        running: false,
+        score: 0,
+        lives: this.settings.startingLives,
+        level: 1,
+        zombieSpeed: this.settings.initialZombieSpeed,
+        spawnRate: this.settings.initialSpawnRate,
+        maxSpeed: this.settings.maxZombieSpeed,
+        maxSpawnRate: this.settings.minSpawnRate
+      };
+      
+      this.player = {
+        x: 80,
+        y: 200,
+        width: 30,
+        height: 50,
+        speed: this.settings.playerSpeed
+      };
+      
+      this.zombies = [];
+      this.bullets = [];
+      this.particles = [];
+      this.bloodSplatters = [];
+      this.keys = {};
+      this.lastSpawn = 0;
+      this.touchStartY = 0;
+      this.isMobile = false;
+      this.screenShake = 0;
+      this.vignette = 0;
+    }
+
+    connectedCallback() {
+      this.setupEventListeners();
+      this.startGame();
+    }
+
+    setupEventListeners() {
+      document.addEventListener('keydown', (e) => {
+        this.keys[e.key] = true;
+        if (e.key === ' ' && this.gameState.running) {
+          e.preventDefault();
+          this.shoot();
+        }
+      });
+
+      document.addEventListener('keyup', (e) => {
+        this.keys[e.key] = false;
+      });
+
+      this.canvas.addEventListener('click', () => {
+        if (this.gameState.running) {
+          this.shoot();
+        }
+      });
+
+      this.canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        this.isMobile = true;
+        this.touchStartY = e.touches[0].clientY;
+        if (this.gameState.running) {
+          this.shoot();
+        }
+      });
+
+      this.canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (!this.gameState.running) return;
+        
+        const touch = e.touches[0];
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleY = this.canvas.height / rect.height;
+        const touchY = (touch.clientY - rect.top) * scaleY;
+        
+        this.player.y = Math.max(0, Math.min(this.canvas.height - this.player.height, touchY - this.player.height / 2));
+      });
+
+      this.restartBtn.addEventListener('click', () => {
+        this.startGame();
+      });
+    }
+
+    startGame() {
+      this.gameState = {
+        running: true,
+        score: 0,
+        lives: this.settings.startingLives,
+        level: 1,
+        zombieSpeed: this.settings.initialZombieSpeed,
+        spawnRate: this.settings.initialSpawnRate,
+        maxSpeed: this.settings.maxZombieSpeed,
+        maxSpawnRate: this.settings.minSpawnRate
+      };
+      
+      this.player.y = 200;
+      this.zombies = [];
+      this.bullets = [];
+      this.particles = [];
+      this.bloodSplatters = [];
+      this.lastSpawn = 0;
+      this.screenShake = 0;
+      this.vignette = 0;
+      
+      this.overlay.classList.add('ai-zombie-game-hidden-{{ ai_gen_id }}');
+      this.updateHUD();
+      this.gameLoop();
+    }
+
+    shoot() {
+      this.bullets.push({
+        x: this.player.x + this.player.width,
+        y: this.player.y + this.player.height / 2,
+        width: 10,
+        height: 4,
+        speed: this.settings.bulletSpeed
+      });
+      
+      this.screenShake = 3;
+      
+      for (let i = 0; i < 5; i++) {
+        this.particles.push({
+          x: this.player.x + this.player.width,
+          y: this.player.y + this.player.height / 2,
+          vx: Math.random() * 3 + 2,
+          vy: (Math.random() - 0.5) * 3,
+          life: 15,
+          color: this.settings.bulletColor,
+          size: Math.random() * 3 + 2
+        });
+      }
+    }
+
+    spawnZombie(timestamp) {
+      if (timestamp - this.lastSpawn > this.gameState.spawnRate) {
+        const isFat = Math.random() < this.settings.fatZombieChance;
+        const speedVariation = 0.5 + Math.random() * 0.5;
+        this.zombies.push({
+          x: this.canvas.width,
+          y: Math.random() * (this.canvas.height - 60),
+          width: isFat ? 45 : 30,
+          height: 60,
+          speed: isFat ? this.gameState.zombieSpeed * 1.6 * speedVariation : this.gameState.zombieSpeed * speedVariation,
+          health: isFat ? this.settings.fatZombieHealth : this.settings.normalZombieHealth,
+          maxHealth: isFat ? this.settings.fatZombieHealth : this.settings.normalZombieHealth,
+          isFat: isFat,
+          armOffset: Math.random() * Math.PI * 2
+        });
+        this.lastSpawn = timestamp;
+      }
+    }
+
+    updateDifficulty() {
+      const scoreThreshold = 100;
+      const newLevel = Math.floor(this.gameState.score / scoreThreshold) + 1;
+      
+      if (newLevel > this.gameState.level) {
+        this.gameState.level = newLevel;
+        
+        this.gameState.zombieSpeed = Math.min(
+          this.gameState.maxSpeed,
+          this.settings.initialZombieSpeed + (this.gameState.level - 1) * 0.3
+        );
+        
+        this.gameState.spawnRate = Math.max(
+          this.gameState.maxSpawnRate,
+          this.settings.initialSpawnRate - (this.gameState.level - 1) * 150
+        );
+        
+        this.levelDisplay.textContent = `WAVE: ${this.gameState.level}`;
+      }
+    }
+
+    checkCollisions() {
+      for (let i = this.bullets.length - 1; i >= 0; i--) {
+        const bullet = this.bullets[i];
+        
+        for (let j = this.zombies.length - 1; j >= 0; j--) {
+          const zombie = this.zombies[j];
+          
+          if (bullet.x < zombie.x + zombie.width &&
+              bullet.x + bullet.width > zombie.x &&
+              bullet.y < zombie.y + zombie.height &&
+              bullet.y + bullet.height > zombie.y) {
+            
+            zombie.health--;
+            this.bullets.splice(i, 1);
+            this.screenShake = 5;
+            
+            for (let k = 0; k < 12; k++) {
+              this.particles.push({
+                x: zombie.x + zombie.width / 2,
+                y: zombie.y + zombie.height / 2,
+                vx: (Math.random() - 0.5) * 6,
+                vy: (Math.random() - 0.5) * 6,
+                life: 25,
+                color: Math.random() > 0.5 ? '#ff0000' : '#8b0000',
+                size: Math.random() * 4 + 2
+              });
+            }
+            
+            this.bloodSplatters.push({
+              x: zombie.x + zombie.width / 2,
+              y: zombie.y + zombie.height / 2,
+              life: 60,
+              size: Math.random() * 15 + 10
+            });
+            
+            if (zombie.health <= 0) {
+              this.zombies.splice(j, 1);
+              this.gameState.score += zombie.isFat ? this.settings.pointsPerFatKill : this.settings.pointsPerKill;
+              this.updateDifficulty();
+              this.updateHUD();
+              
+              for (let k = 0; k < 20; k++) {
+                this.particles.push({
+                  x: zombie.x + zombie.width / 2,
+                  y: zombie.y + zombie.height / 2,
+                  vx: (Math.random() - 0.5) * 8,
+                  vy: (Math.random() - 0.5) * 8,
+                  life: 40,
+                  color: Math.random() > 0.3 ? '#ff0000' : '#00ff00',
+                  size: Math.random() * 5 + 2
+                });
+              }
+            }
+            break;
+          }
+        }
+      }
+      
+      for (let i = this.zombies.length - 1; i >= 0; i--) {
+        const zombie = this.zombies[i];
+        
+        if (zombie.x + zombie.width < 0) {
+          this.zombies.splice(i, 1);
+          this.takeDamage();
+          continue;
+        }
+        
+        if (this.player.x < zombie.x + zombie.width &&
+            this.player.x + this.player.width > zombie.x &&
+            this.player.y < zombie.y + zombie.height &&
+            this.player.y + this.player.height > zombie.y) {
+          
+          this.zombies.splice(i, 1);
+          this.takeDamage();
+        }
+      }
+    }
+
+    takeDamage() {
+      this.gameState.lives--;
+      this.updateHUD();
+      this.screenShake = 15;
+      this.vignette = 1;
+      
+      for (let k = 0; k < 30; k++) {
+        this.particles.push({
+          x: this.player.x + this.player.width / 2,
+          y: this.player.y + this.player.height / 2,
+          vx: (Math.random() - 0.5) * 10,
+          vy: (Math.random() - 0.5) * 10,
+          life: 50,
+          color: '#ff0000',
+          size: Math.random() * 6 + 3
+        });
+      }
+      
+      if (this.gameState.lives <= 0) {
+        this.gameOver();
+      }
+    }
+
+    updateHUD() {
+      this.scoreDisplay.textContent = `SCORE: ${this.gameState.score}`;
+      
+      this.livesDisplay.innerHTML = '';
+      for (let i = 0; i < this.settings.startingLives; i++) {
+        const heart = document.createElement('div');
+        if (i < this.gameState.lives) {
+          heart.className = 'ai-zombie-game-heart-{{ ai_gen_id }}';
+        } else {
+          heart.className = 'ai-zombie-game-heart-{{ ai_gen_id }} ai-zombie-game-heart-empty-{{ ai_gen_id }}';
+        }
+        this.livesDisplay.appendChild(heart);
+      }
+    }
+
+    gameOver() {
+      this.gameState.running = false;
+      
+      const highScore = this.getHighScore();
+      if (this.gameState.score > highScore) {
+        this.saveHighScore(this.gameState.score);
+      }
+      
+      this.overlayScore.textContent = `Score: ${this.gameState.score}`;
+      this.overlayHighScore.textContent = `High Score: ${Math.max(this.gameState.score, highScore)}`;
+      this.overlay.classList.remove('ai-zombie-game-hidden-{{ ai_gen_id }}');
+    }
+
+    getHighScore() {
+      const saved = localStorage.getItem('zombieShooterHighScore{{ ai_gen_id }}');
+      return saved ? parseInt(saved) : 0;
+    }
+
+    saveHighScore(score) {
+      localStorage.setItem('zombieShooterHighScore{{ ai_gen_id }}', score.toString());
+    }
+
+    drawPlayer() {
+      this.ctx.fillStyle = this.settings.playerColor;
+      this.ctx.fillRect(this.player.x, this.player.y + 10, this.player.width, 30);
+      
+      this.ctx.fillStyle = '#ffcc99';
+      this.ctx.fillRect(this.player.x + 8, this.player.y, 14, 14);
+      
+      this.ctx.fillStyle = '#ffdd00';
+      this.ctx.fillRect(this.player.x + 6, this.player.y - 4, 6, 6);
+      this.ctx.fillRect(this.player.x + 18, this.player.y - 4, 6, 6);
+      
+      this.ctx.fillStyle = this.settings.playerColor;
+      this.ctx.fillRect(this.player.x + 5, this.player.y + 40, 8, 10);
+      this.ctx.fillRect(this.player.x + 17, this.player.y + 40, 8, 10);
+      
+      this.ctx.fillStyle = '#333333';
+      this.ctx.fillRect(this.player.x + 30, this.player.y + 18, 14, 5);
+      
+      this.ctx.fillStyle = '#666666';
+      this.ctx.fillRect(this.player.x + 44, this.player.y + 19, 3, 3);
+    }
+
+    drawZombie(zombie) {
+      zombie.armOffset += 0.15;
+      
+      this.ctx.fillStyle = this.settings.zombieColor;
+      this.ctx.fillRect(zombie.x, zombie.y + 15, zombie.width, 35);
+      
+      const headColor = this.settings.zombieColor;
+      this.ctx.fillStyle = headColor;
+      this.ctx.fillRect(zombie.x + (zombie.isFat ? 10 : 8), zombie.y, zombie.isFat ? 25 : 14, 18);
+      
+      this.ctx.fillStyle = '#ff0000';
+      this.ctx.fillRect(zombie.x + (zombie.isFat ? 13 : 10), zombie.y + 6, 4, 4);
+      this.ctx.fillRect(zombie.x + (zombie.isFat ? 28 : 17), zombie.y + 6, 4, 4);
+      
+      this.ctx.fillStyle = '#222222';
+      this.ctx.fillRect(zombie.x + (zombie.isFat ? 18 : 13), zombie.y + 13, zombie.isFat ? 8 : 5, 3);
+      
+      const armSwing = Math.sin(zombie.armOffset) * 3;
+      this.ctx.fillStyle = this.settings.zombieColor;
+      this.ctx.fillRect(zombie.x - 5, zombie.y + 20 + armSwing, 8, 15);
+      this.ctx.fillRect(zombie.x + zombie.width - 3, zombie.y + 20 - armSwing, 8, 15);
+      
+      this.ctx.fillStyle = this.settings.zombieColor;
+      this.ctx.fillRect(zombie.x + (zombie.isFat ? 8 : 5), zombie.y + 50, zombie.isFat ? 14 : 10, 10);
+      this.ctx.fillRect(zombie.x + (zombie.isFat ? 23 : 15), zombie.y + 50, zombie.isFat ? 14 : 10, 10);
+      
+      this.ctx.fillStyle = '#8b0000';
+      const bloodSpots = zombie.isFat ? 6 : 4;
+      for (let i = 0; i < bloodSpots; i++) {
+        this.ctx.fillRect(
+          zombie.x + Math.random() * zombie.width,
+          zombie.y + 20 + Math.random() * 25,
+          4, 4
+        );
+      }
+      
+      if (zombie.health < zombie.maxHealth) {
+        this.ctx.fillStyle = '#ff0000';
+        for (let i = 0; i < 3; i++) {
+          this.ctx.fillRect(
+            zombie.x + Math.random() * zombie.width,
+            zombie.y + Math.random() * zombie.height,
+            3, 3
+          );
+        }
+      }
+    }
+
+    drawBullet(bullet) {
+      this.ctx.fillStyle = this.settings.bulletColor;
+      this.ctx.fillRect(bullet.x, bullet.y - 1, bullet.width, bullet.height);
+      const darkerBullet = this.settings.bulletColor.replace('#ffff', '#ff88');
+      this.ctx.fillStyle = darkerBullet;
+      this.ctx.fillRect(bullet.x + 2, bullet.y, bullet.width - 4, bullet.height - 2);
+    }
+
+    drawParticle(particle) {
+      this.ctx.fillStyle = particle.color;
+      this.ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
+    }
+
+    drawBloodSplatter(splatter) {
+      this.ctx.fillStyle = `rgba(139, 0, 0, ${splatter.life / 60})`;
+      this.ctx.fillRect(splatter.x - splatter.size / 2, splatter.y - splatter.size / 2, splatter.size, splatter.size);
+      this.ctx.fillRect(splatter.x - splatter.size / 4, splatter.y + splatter.size / 4, splatter.size / 2, splatter.size / 2);
+      this.ctx.fillRect(splatter.x + splatter.size / 4, splatter.y - splatter.size / 4, splatter.size / 2, splatter.size / 2);
+    }
+
+    update() {
+      if (this.screenShake > 0) {
+        this.screenShake *= 0.9;
+        if (this.screenShake < 0.5) this.screenShake = 0;
+      }
+      
+      if (this.vignette > 0) {
+        this.vignette *= 0.95;
+        if (this.vignette < 0.01) this.vignette = 0;
+      }
+      
+      if (!this.isMobile) {
+        if (this.keys['ArrowUp'] || this.keys['w']) {
+          this.player.y = Math.max(0, this.player.y - this.player.speed);
+        }
+        if (this.keys['ArrowDown'] || this.keys['s']) {
+          this.player.y = Math.min(this.canvas.height - this.player.height, this.player.y + this.player.speed);
+        }
+      }
+      
+      for (let i = this.bullets.length - 1; i >= 0; i--) {
+        this.bullets[i].x += this.bullets[i].speed;
+        if (this.bullets[i].x > this.canvas.width) {
+          this.bullets.splice(i, 1);
+        }
+      }
+      
+      for (let i = this.zombies.length - 1; i >= 0; i--) {
+        this.zombies[i].x -= this.zombies[i].speed;
+      }
+      
+      for (let i = this.particles.length - 1; i >= 0; i--) {
+        const p = this.particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.2;
+        p.life--;
+        if (p.life <= 0) {
+          this.particles.splice(i, 1);
+        }
+      }
+      
+      for (let i = this.bloodSplatters.length - 1; i >= 0; i--) {
+        this.bloodSplatters[i].life--;
+        if (this.bloodSplatters[i].life <= 0) {
+          this.bloodSplatters.splice(i, 1);
+        }
+      }
+    }
+
+    draw() {
+      this.ctx.save();
+      
+      if (this.screenShake > 0) {
+        this.ctx.translate(
+          (Math.random() - 0.5) * this.screenShake,
+          (Math.random() - 0.5) * this.screenShake
+        );
+      }
+      
+      this.ctx.fillStyle = '#0d0d1a';
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      
+      this.bloodSplatters.forEach(splatter => this.drawBloodSplatter(splatter));
+      
+      this.drawPlayer();
+      
+      this.zombies.forEach(zombie => this.drawZombie(zombie));
+      this.bullets.forEach(bullet => this.drawBullet(bullet));
+      this.particles.forEach(particle => this.drawParticle(particle));
+      
+      if (this.vignette > 0) {
+        const vignetteGradient = this.ctx.createRadialGradient(
+          this.canvas.width / 2, this.canvas.height / 2, 100,
+          this.canvas.width / 2, this.canvas.height / 2, this.canvas.width
+        );
+        vignetteGradient.addColorStop(0, 'rgba(139, 0, 0, 0)');
+        vignetteGradient.addColorStop(1, `rgba(139, 0, 0, ${this.vignette * 0.5})`);
+        this.ctx.fillStyle = vignetteGradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      }
+      
+      this.ctx.restore();
+    }
+
+    gameLoop(timestamp = 0) {
+      if (!this.gameState.running) return;
+      
+      this.spawnZombie(timestamp);
+      this.update();
+      this.checkCollisions();
+      this.draw();
+      
+      requestAnimationFrame((ts) => this.gameLoop(ts));
+    }
+  }
+
+  customElements.define('zombie-shooter-{{ ai_gen_id }}', ZombieShooter{{ ai_gen_id }});
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Night of the Dead",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Game text"
+    },
+    {
+      "type": "text",
+      "id": "game_title",
+      "label": "Game title",
+      "default": "NIGHT OF THE DEAD"
+    },
+    {
+      "type": "text",
+      "id": "game_subtitle",
+      "label": "Game subtitle",
+      "default": "SURVIVE THE HORDE"
+    },
+    {
+      "type": "text",
+      "id": "game_over_text",
+      "label": "Game over text",
+      "default": "YOU DIED"
+    },
+    {
+      "type": "text",
+      "id": "restart_button_text",
+      "label": "Restart button text",
+      "default": "Start Over"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border",
+      "default": "#8b0000"
+    },
+    {
+      "type": "color",
+      "id": "canvas_border_color",
+      "label": "Canvas border",
+      "default": "#4a0000"
+    },
+    {
+      "type": "color",
+      "id": "background_color_top",
+      "label": "Background top",
+      "default": "#0d0d1a"
+    },
+    {
+      "type": "color",
+      "id": "background_color_bottom",
+      "label": "Background bottom",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title",
+      "default": "#ff0000"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Subtitle",
+      "default": "#00ff00"
+    },
+    {
+      "type": "color",
+      "id": "score_color",
+      "label": "Score",
+      "default": "#ffff00"
+    },
+    {
+      "type": "color",
+      "id": "level_color",
+      "label": "Level",
+      "default": "#ff6600"
+    },
+    {
+      "type": "color",
+      "id": "heart_color",
+      "label": "Heart",
+      "default": "#ff0000"
+    },
+    {
+      "type": "color",
+      "id": "game_over_color",
+      "label": "Game over text",
+      "default": "#8b0000"
+    },
+    {
+      "type": "color",
+      "id": "player_color",
+      "label": "Player jumpsuit",
+      "default": "#ff6600"
+    },
+    {
+      "type": "color",
+      "id": "zombie_color",
+      "label": "Zombie",
+      "default": "#4a6a4a"
+    },
+    {
+      "type": "color",
+      "id": "bullet_color",
+      "label": "Bullet",
+      "default": "#ffff00"
+    },
+    {
+      "type": "header",
+      "content": "Gameplay"
+    },
+    {
+      "type": "range",
+      "id": "starting_lives",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "label": "Starting lives",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "player_speed",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "label": "Player speed",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "bullet_speed",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "label": "Bullet speed",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "initial_zombie_speed",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "label": "Initial zombie speed",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "max_zombie_speed",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "label": "Max zombie speed",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "initial_spawn_rate",
+      "min": 500,
+      "max": 3000,
+      "step": 100,
+      "unit": "ms",
+      "label": "Initial spawn rate",
+      "default": 2000
+    },
+    {
+      "type": "range",
+      "id": "min_spawn_rate",
+      "min": 200,
+      "max": 1000,
+      "step": 50,
+      "unit": "ms",
+      "label": "Min spawn rate",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "fat_zombie_chance",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "label": "Fat zombie chance",
+      "default": 0.2
+    },
+    {
+      "type": "range",
+      "id": "normal_zombie_health",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "label": "Normal zombie health",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "fat_zombie_health",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "label": "Fat zombie health",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "points_per_kill",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "label": "Points per kill",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "points_per_fat_kill",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "label": "Points per fat kill",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "Night of the Dead"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,1078 @@
+{% doc %}
+  @prompt
+    can you make me a mp3 style music player and give me like 2o slots of music to put in , make it more 90s internet coded like that era of early 2000s internet mp3 player. dont take up the whole screen either. add a bunch of customization settings, make it smaller but keep it in that style , can you make it so i can just upload direct mp3 files. and make the mp3 player smaller like only on the left side, make it similar but in the middle, can you make it very basic like just the black screen with the basic play and skip buttons. no window , remove the playlist being visible.,  allow the music to play no matter where the person navigates in the website
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-music-player-wrapper-{{ ai_gen_id }} {
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .ai-music-player-{{ ai_gen_id }} {
+    background: {{ block.settings.player_bg_color }};
+    border: {{ block.settings.border_width }}px solid {{ block.settings.border_color }};
+    max-width: {{ block.settings.player_width }}px;
+    font-family: 'Courier New', monospace;
+    padding: {{ block.settings.content_padding }}px;
+  }
+
+  .ai-music-player__display-{{ ai_gen_id }} {
+    background: {{ block.settings.display_bg_color }};
+    border: {{ block.settings.display_border_width }}px inset {{ block.settings.display_border_color }};
+    padding: 10px;
+    margin-bottom: 12px;
+    font-family: 'Courier New', monospace;
+    min-height: 50px;
+  }
+
+  .ai-music-player__marquee-{{ ai_gen_id }} {
+    color: {{ block.settings.display_text_color }};
+    font-size: {{ block.settings.display_font_size }}px;
+    font-weight: bold;
+    margin: 0 0 4px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .ai-music-player__marquee-text-{{ ai_gen_id }} {
+    display: inline-block;
+    {% if block.settings.enable_marquee %}
+      animation: ai-marquee-{{ ai_gen_id }} {{ block.settings.marquee_speed }}s linear infinite;
+    {% endif %}
+  }
+
+  @keyframes ai-marquee-{{ ai_gen_id }} {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  .ai-music-player__status-{{ ai_gen_id }} {
+    color: {{ block.settings.display_text_color }};
+    font-size: 10px;
+    margin: 0;
+  }
+
+  .ai-music-player__visualizer-{{ ai_gen_id }} {
+    display: flex;
+    gap: 2px;
+    height: 16px;
+    align-items: flex-end;
+    margin-top: 6px;
+  }
+
+  .ai-music-player__visualizer-bar-{{ ai_gen_id }} {
+    width: 4px;
+    background: {{ block.settings.visualizer_color }};
+    transition: height 0.1s ease;
+  }
+
+  .ai-music-player__controls-{{ ai_gen_id }} {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+    justify-content: center;
+  }
+
+  .ai-music-player__control-btn-{{ ai_gen_id }} {
+    background: {{ block.settings.button_bg_color }};
+    border: 2px outset {{ block.settings.button_border_color }};
+    color: {{ block.settings.button_text_color }};
+    padding: 6px 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    min-width: 50px;
+  }
+
+  .ai-music-player__control-btn-{{ ai_gen_id }}:active {
+    border-style: inset;
+  }
+
+  .ai-music-player__control-btn-{{ ai_gen_id }}:hover {
+    background: {{ block.settings.button_hover_color }};
+  }
+
+  .ai-music-player__progress-{{ ai_gen_id }} {
+    margin-bottom: 12px;
+  }
+
+  .ai-music-player__progress-label-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: 9px;
+    margin: 0 0 4px;
+    text-transform: uppercase;
+  }
+
+  .ai-music-player__progress-bar-{{ ai_gen_id }} {
+    width: 100%;
+    height: {{ block.settings.progress_height }}px;
+    background: {{ block.settings.progress_bg_color }};
+    border: 2px inset {{ block.settings.border_color }};
+    cursor: pointer;
+    position: relative;
+  }
+
+  .ai-music-player__progress-fill-{{ ai_gen_id }} {
+    height: 100%;
+    background: {{ block.settings.progress_fill_color }};
+    width: 0%;
+    {% if block.settings.enable_progress_stripes %}
+      background-image: repeating-linear-gradient(
+        45deg,
+        {{ block.settings.progress_fill_color }},
+        {{ block.settings.progress_fill_color }} 10px,
+        {{ block.settings.progress_stripe_color }} 10px,
+        {{ block.settings.progress_stripe_color }} 20px
+      );
+    {% endif %}
+  }
+
+  .ai-music-player__time-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: space-between;
+    color: {{ block.settings.text_color }};
+    font-size: 9px;
+    margin-top: 4px;
+  }
+
+  .ai-music-player__volume-{{ ai_gen_id }} {
+    margin-bottom: 0;
+  }
+
+  .ai-music-player__volume-label-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: 9px;
+    margin: 0 0 4px;
+    text-transform: uppercase;
+  }
+
+  .ai-music-player__volume-control-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ai-music-player__volume-slider-{{ ai_gen_id }} {
+    flex-grow: 1;
+    height: 14px;
+    background: {{ block.settings.progress_bg_color }};
+    border: 2px inset {{ block.settings.border_color }};
+    cursor: pointer;
+    position: relative;
+  }
+
+  .ai-music-player__volume-fill-{{ ai_gen_id }} {
+    height: 100%;
+    background: {{ block.settings.volume_fill_color }};
+    width: 70%;
+  }
+
+  .ai-music-player__volume-text-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: 9px;
+    min-width: 35px;
+  }
+
+  .ai-music-player__playlist-{{ ai_gen_id }} {
+    display: none;
+  }
+
+  .ai-music-player__empty-state-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 20px;
+    color: {{ block.settings.text_color }};
+    font-size: 10px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-music-player-wrapper-{{ ai_gen_id }} {
+      padding: 10px;
+    }
+    
+    .ai-music-player-{{ ai_gen_id }} {
+      max-width: 100%;
+    }
+  }
+{% endstyle %}
+
+<music-player-{{ ai_gen_id }} class="ai-music-player-wrapper-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-music-player-{{ ai_gen_id }}">
+    <div class="ai-music-player__display-{{ ai_gen_id }}">
+      <p class="ai-music-player__marquee-{{ ai_gen_id }}">
+        <span class="ai-music-player__marquee-text-{{ ai_gen_id }}" data-marquee-text>*** SELECT A TRACK TO BEGIN ***</span>
+      </p>
+      <p class="ai-music-player__status-{{ ai_gen_id }}" data-status-text>STATUS: STOPPED</p>
+      {% if block.settings.show_visualizer %}
+        <div class="ai-music-player__visualizer-{{ ai_gen_id }}" data-visualizer>
+          {% for i in (1..14) %}
+            <div class="ai-music-player__visualizer-bar-{{ ai_gen_id }}" data-bar="{{ forloop.index }}"></div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="ai-music-player__controls-{{ ai_gen_id }}">
+      <button class="ai-music-player__control-btn-{{ ai_gen_id }}" data-prev-btn>|◄◄</button>
+      <button class="ai-music-player__control-btn-{{ ai_gen_id }}" data-play-btn>►</button>
+      <button class="ai-music-player__control-btn-{{ ai_gen_id }}" data-stop-btn>■</button>
+      <button class="ai-music-player__control-btn-{{ ai_gen_id }}" data-next-btn>►►|</button>
+    </div>
+
+    <div class="ai-music-player__progress-{{ ai_gen_id }}">
+      <p class="ai-music-player__progress-label-{{ ai_gen_id }}">Progress:</p>
+      <div class="ai-music-player__progress-bar-{{ ai_gen_id }}" data-progress-bar>
+        <div class="ai-music-player__progress-fill-{{ ai_gen_id }}" data-progress-fill></div>
+      </div>
+      <div class="ai-music-player__time-{{ ai_gen_id }}">
+        <span data-current-time>00:00</span>
+        <span data-duration>00:00</span>
+      </div>
+    </div>
+
+    <div class="ai-music-player__volume-{{ ai_gen_id }}">
+      <p class="ai-music-player__volume-label-{{ ai_gen_id }}">Volume:</p>
+      <div class="ai-music-player__volume-control-{{ ai_gen_id }}">
+        <div class="ai-music-player__volume-slider-{{ ai_gen_id }}" data-volume-slider>
+          <div class="ai-music-player__volume-fill-{{ ai_gen_id }}" data-volume-fill></div>
+        </div>
+        <span class="ai-music-player__volume-text-{{ ai_gen_id }}" data-volume-text>70%</span>
+      </div>
+    </div>
+
+    <div class="ai-music-player__playlist-{{ ai_gen_id }}">
+      {% assign has_tracks = false %}
+      {% for i in (1..20) %}
+        {% liquid
+          assign track_name_key = 'track_' | append: i | append: '_name'
+          assign track_file_key = 'track_' | append: i | append: '_file'
+          
+          assign track_name = block.settings[track_name_key]
+          assign track_file = block.settings[track_file_key]
+        %}
+        
+        {% if track_name != blank and track_file != blank %}
+          {% assign has_tracks = true %}
+          <div data-track-index="{{ forloop.index0 }}" data-track-url="{{ track_file }}" data-track-name="{{ track_name }}"></div>
+        {% endif %}
+      {% endfor %}
+      
+      {% unless has_tracks %}
+        <div class="ai-music-player__empty-state-{{ ai_gen_id }}">
+          &gt;&gt; NO TRACKS LOADED &lt;&lt;<br>
+          Upload MP3 files to playlist
+        </div>
+      {% endunless %}
+    </div>
+  </div>
+
+  <audio data-audio-element style="display: none;"></audio>
+</music-player-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    const STORAGE_KEY = 'globalMusicPlayer{{ ai_gen_id }}';
+    
+    window.GlobalMusicPlayer{{ ai_gen_id }} = window.GlobalMusicPlayer{{ ai_gen_id }} || {
+      audio: null,
+      currentTrackIndex: -1,
+      isPlaying: false,
+      volume: 0.7,
+      currentTime: 0,
+      tracks: []
+    };
+
+    class MusicPlayer{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.playBtn = this.querySelector('[data-play-btn]');
+        this.stopBtn = this.querySelector('[data-stop-btn]');
+        this.prevBtn = this.querySelector('[data-prev-btn]');
+        this.nextBtn = this.querySelector('[data-next-btn]');
+        this.progressBar = this.querySelector('[data-progress-bar]');
+        this.progressFill = this.querySelector('[data-progress-fill]');
+        this.currentTimeEl = this.querySelector('[data-current-time]');
+        this.durationEl = this.querySelector('[data-duration]');
+        this.marqueeText = this.querySelector('[data-marquee-text]');
+        this.statusText = this.querySelector('[data-status-text]');
+        this.volumeSlider = this.querySelector('[data-volume-slider]');
+        this.volumeFill = this.querySelector('[data-volume-fill]');
+        this.volumeText = this.querySelector('[data-volume-text]');
+        this.visualizer = this.querySelector('[data-visualizer]');
+        this.visualizerInterval = null;
+        
+        this.globalState = window.GlobalMusicPlayer{{ ai_gen_id }};
+      }
+
+      connectedCallback() {
+        this.initializeGlobalAudio();
+        this.loadTracks();
+        this.restoreState();
+        this.setupEventListeners();
+        this.updateUI();
+      }
+
+      disconnectedCallback() {
+        this.saveState();
+        if (this.visualizerInterval) {
+          clearInterval(this.visualizerInterval);
+        }
+      }
+
+      initializeGlobalAudio() {
+        if (!this.globalState.audio) {
+          this.globalState.audio = new Audio();
+          this.globalState.audio.volume = this.globalState.volume;
+          
+          this.globalState.audio.addEventListener('timeupdate', () => {
+            this.globalState.currentTime = this.globalState.audio.currentTime;
+            this.updateProgress();
+          });
+          
+          this.globalState.audio.addEventListener('loadedmetadata', () => {
+            this.updateDuration();
+          });
+          
+          this.globalState.audio.addEventListener('ended', () => {
+            this.nextTrack();
+          });
+        }
+      }
+
+      loadTracks() {
+        const trackElements = Array.from(this.querySelectorAll('[data-track-index]'));
+        
+        if (trackElements.length > 0) {
+          this.globalState.tracks = trackElements.map(track => ({
+            url: track.dataset.trackUrl,
+            name: track.dataset.trackName
+          }));
+        }
+      }
+
+      saveState() {
+        const state = {
+          currentTrackIndex: this.globalState.currentTrackIndex,
+          isPlaying: this.globalState.isPlaying,
+          volume: this.globalState.volume,
+          currentTime: this.globalState.currentTime,
+          tracks: this.globalState.tracks
+        };
+        
+        try {
+          sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+          console.error('Failed to save player state:', e);
+        }
+      }
+
+      restoreState() {
+        try {
+          const saved = sessionStorage.getItem(STORAGE_KEY);
+          if (saved) {
+            const state = JSON.parse(saved);
+            
+            if (state.tracks && state.tracks.length > 0 && this.globalState.tracks.length === 0) {
+              this.globalState.tracks = state.tracks;
+            }
+            
+            if (state.currentTrackIndex >= 0 && state.currentTrackIndex < this.globalState.tracks.length) {
+              this.globalState.currentTrackIndex = state.currentTrackIndex;
+              this.loadTrack(state.currentTrackIndex, false);
+              
+              if (state.currentTime) {
+                this.globalState.audio.currentTime = state.currentTime;
+              }
+              
+              if (state.isPlaying) {
+                this.play();
+              }
+            } else if (this.globalState.tracks.length > 0 && this.globalState.currentTrackIndex === -1) {
+              this.loadTrack(0, false);
+            }
+            
+            if (state.volume !== undefined) {
+              this.globalState.volume = state.volume;
+              this.globalState.audio.volume = state.volume;
+              this.volumeFill.style.width = (state.volume * 100) + '%';
+              this.volumeText.textContent = Math.round(state.volume * 100) + '%';
+            }
+          } else if (this.globalState.tracks.length > 0 && this.globalState.currentTrackIndex === -1) {
+            this.loadTrack(0, false);
+          }
+        } catch (e) {
+          console.error('Failed to restore player state:', e);
+          if (this.globalState.tracks.length > 0) {
+            this.loadTrack(0, false);
+          }
+        }
+      }
+
+      setupEventListeners() {
+        this.playBtn.addEventListener('click', () => this.togglePlay());
+        this.stopBtn.addEventListener('click', () => this.stop());
+        this.prevBtn.addEventListener('click', () => this.previousTrack());
+        this.nextBtn.addEventListener('click', () => this.nextTrack());
+        this.progressBar.addEventListener('click', (e) => this.seek(e));
+        this.volumeSlider.addEventListener('click', (e) => this.setVolume(e));
+        
+        window.addEventListener('beforeunload', () => {
+          this.saveState();
+        });
+      }
+
+      loadTrack(index, autoplay = false) {
+        if (index < 0 || index >= this.globalState.tracks.length) return;
+
+        this.globalState.currentTrackIndex = index;
+        const track = this.globalState.tracks[index];
+
+        this.globalState.audio.src = track.url;
+        this.marqueeText.textContent = '♪♫ ' + track.name.toUpperCase() + ' ♫♪';
+        
+        if (autoplay && this.globalState.isPlaying) {
+          this.play();
+        }
+        
+        this.saveState();
+      }
+
+      updateUI() {
+        if (this.globalState.isPlaying) {
+          this.playBtn.textContent = '❚❚';
+          this.statusText.textContent = 'STATUS: PLAYING';
+          this.startVisualizer();
+        } else {
+          this.playBtn.textContent = '►';
+          this.statusText.textContent = this.globalState.audio.currentTime > 0 ? 'STATUS: PAUSED' : 'STATUS: STOPPED';
+          this.stopVisualizer();
+        }
+        
+        if (this.globalState.currentTrackIndex >= 0 && this.globalState.tracks[this.globalState.currentTrackIndex]) {
+          const track = this.globalState.tracks[this.globalState.currentTrackIndex];
+          this.marqueeText.textContent = '♪♫ ' + track.name.toUpperCase() + ' ♫♪';
+        }
+      }
+
+      togglePlay() {
+        if (this.globalState.currentTrackIndex === -1 && this.globalState.tracks.length > 0) {
+          this.loadTrack(0);
+        }
+
+        if (this.globalState.isPlaying) {
+          this.pause();
+        } else {
+          this.play();
+        }
+      }
+
+      play() {
+        this.globalState.audio.play();
+        this.globalState.isPlaying = true;
+        this.playBtn.textContent = '❚❚';
+        this.statusText.textContent = 'STATUS: PLAYING';
+        this.startVisualizer();
+        this.saveState();
+      }
+
+      pause() {
+        this.globalState.audio.pause();
+        this.globalState.isPlaying = false;
+        this.playBtn.textContent = '►';
+        this.statusText.textContent = 'STATUS: PAUSED';
+        this.stopVisualizer();
+        this.saveState();
+      }
+
+      stop() {
+        this.globalState.audio.pause();
+        this.globalState.audio.currentTime = 0;
+        this.globalState.isPlaying = false;
+        this.playBtn.textContent = '►';
+        this.statusText.textContent = 'STATUS: STOPPED';
+        this.stopVisualizer();
+        this.saveState();
+      }
+
+      previousTrack() {
+        if (this.globalState.currentTrackIndex > 0) {
+          this.loadTrack(this.globalState.currentTrackIndex - 1, true);
+        }
+      }
+
+      nextTrack() {
+        if (this.globalState.currentTrackIndex < this.globalState.tracks.length - 1) {
+          this.loadTrack(this.globalState.currentTrackIndex + 1, true);
+        } else {
+          this.stop();
+        }
+      }
+
+      updateProgress() {
+        const progress = (this.globalState.audio.currentTime / this.globalState.audio.duration) * 100;
+        this.progressFill.style.width = progress + '%';
+        this.currentTimeEl.textContent = this.formatTime(this.globalState.audio.currentTime);
+      }
+
+      updateDuration() {
+        this.durationEl.textContent = this.formatTime(this.globalState.audio.duration);
+      }
+
+      seek(e) {
+        const rect = this.progressBar.getBoundingClientRect();
+        const percent = (e.clientX - rect.left) / rect.width;
+        this.globalState.audio.currentTime = percent * this.globalState.audio.duration;
+      }
+
+      setVolume(e) {
+        const rect = this.volumeSlider.getBoundingClientRect();
+        const percent = (e.clientX - rect.left) / rect.width;
+        this.globalState.volume = Math.max(0, Math.min(1, percent));
+        this.globalState.audio.volume = this.globalState.volume;
+        this.volumeFill.style.width = (percent * 100) + '%';
+        this.volumeText.textContent = Math.round(percent * 100) + '%';
+        this.saveState();
+      }
+
+      startVisualizer() {
+        if (!this.visualizer) return;
+        
+        this.visualizerInterval = setInterval(() => {
+          const bars = this.visualizer.querySelectorAll('[data-bar]');
+          bars.forEach((bar) => {
+            const height = Math.random() * 16;
+            bar.style.height = height + 'px';
+          });
+        }, 100);
+      }
+
+      stopVisualizer() {
+        if (this.visualizerInterval) {
+          clearInterval(this.visualizerInterval);
+          this.visualizerInterval = null;
+        }
+        if (this.visualizer) {
+          const bars = this.visualizer.querySelectorAll('[data-bar]');
+          bars.forEach((bar) => {
+            bar.style.height = '2px';
+          });
+        }
+      }
+
+      formatTime(seconds) {
+        if (isNaN(seconds)) return '00:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+      }
+    }
+
+    customElements.define('music-player-{{ ai_gen_id }}', MusicPlayer{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "MP3 music player",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Player settings"
+    },
+    {
+      "type": "range",
+      "id": "player_width",
+      "min": 300,
+      "max": 500,
+      "step": 10,
+      "unit": "px",
+      "label": "Player width",
+      "default": 380
+    },
+    {
+      "type": "range",
+      "id": "content_padding",
+      "min": 8,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Content padding",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "color",
+      "id": "player_bg_color",
+      "label": "Background",
+      "default": "#c0c0c0"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Border width",
+      "default": 2
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#808080"
+    },
+    {
+      "type": "header",
+      "content": "Display screen"
+    },
+    {
+      "type": "color",
+      "id": "display_bg_color",
+      "label": "Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "display_text_color",
+      "label": "Text color",
+      "default": "#00ff00"
+    },
+    {
+      "type": "range",
+      "id": "display_font_size",
+      "min": 10,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "display_border_width",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Border width",
+      "default": 2
+    },
+    {
+      "type": "color",
+      "id": "display_border_color",
+      "label": "Border color",
+      "default": "#404040"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_marquee",
+      "label": "Enable scrolling text",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "marquee_speed",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "unit": "s",
+      "label": "Scroll speed",
+      "default": 10
+    },
+    {
+      "type": "checkbox",
+      "id": "show_visualizer",
+      "label": "Show visualizer",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "visualizer_color",
+      "label": "Visualizer color",
+      "default": "#00ff00"
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Background",
+      "default": "#c0c0c0"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_color",
+      "label": "Hover background",
+      "default": "#d4d0c8"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Border color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Progress bar"
+    },
+    {
+      "type": "range",
+      "id": "progress_height",
+      "min": 10,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Height",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "progress_bg_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "progress_fill_color",
+      "label": "Fill color",
+      "default": "#0000ff"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_progress_stripes",
+      "label": "Enable striped pattern",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "progress_stripe_color",
+      "label": "Stripe color",
+      "default": "#0000aa"
+    },
+    {
+      "type": "header",
+      "content": "Volume"
+    },
+    {
+      "type": "color",
+      "id": "volume_fill_color",
+      "label": "Fill color",
+      "default": "#00ff00"
+    },
+    {
+      "type": "header",
+      "content": "General"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Track 1"
+    },
+    {
+      "type": "text",
+      "id": "track_1_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_1_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 2"
+    },
+    {
+      "type": "text",
+      "id": "track_2_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_2_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 3"
+    },
+    {
+      "type": "text",
+      "id": "track_3_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_3_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 4"
+    },
+    {
+      "type": "text",
+      "id": "track_4_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_4_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 5"
+    },
+    {
+      "type": "text",
+      "id": "track_5_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_5_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 6"
+    },
+    {
+      "type": "text",
+      "id": "track_6_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_6_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 7"
+    },
+    {
+      "type": "text",
+      "id": "track_7_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_7_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 8"
+    },
+    {
+      "type": "text",
+      "id": "track_8_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_8_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 9"
+    },
+    {
+      "type": "text",
+      "id": "track_9_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_9_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 10"
+    },
+    {
+      "type": "text",
+      "id": "track_10_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_10_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 11"
+    },
+    {
+      "type": "text",
+      "id": "track_11_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_11_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 12"
+    },
+    {
+      "type": "text",
+      "id": "track_12_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_12_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 13"
+    },
+    {
+      "type": "text",
+      "id": "track_13_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_13_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 14"
+    },
+    {
+      "type": "text",
+      "id": "track_14_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_14_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 15"
+    },
+    {
+      "type": "text",
+      "id": "track_15_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_15_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 16"
+    },
+    {
+      "type": "text",
+      "id": "track_16_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_16_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 17"
+    },
+    {
+      "type": "text",
+      "id": "track_17_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_17_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 18"
+    },
+    {
+      "type": "text",
+      "id": "track_18_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_18_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 19"
+    },
+    {
+      "type": "text",
+      "id": "track_19_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_19_file",
+      "label": "MP3 file"
+    },
+    {
+      "type": "header",
+      "content": "Track 20"
+    },
+    {
+      "type": "text",
+      "id": "track_20_name",
+      "label": "Track name"
+    },
+    {
+      "type": "url",
+      "id": "track_20_file",
+      "label": "MP3 file"
+    }
+  ],
+  "presets": [
+    {
+      "name": "MP3 music player"
+    }
+  ]
+}
+{% endschema %}

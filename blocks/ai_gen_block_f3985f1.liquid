@@ -1,0 +1,318 @@
+{% doc %}
+  @prompt
+    Create a VHS-style overlay effect with scan lines, film grain, and subtle color distortion that can be applied over the page content to give it a retro VHS tape aesthetic, make it less cheesy and more crt like 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-vhs-overlay-{{ ai_gen_id }} {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: {{ block.settings.z_index }};
+    opacity: {{ block.settings.overlay_opacity | divided_by: 100.0 }};
+  }
+
+  .ai-vhs-overlay-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) {{ block.settings.scanline_spacing }}px,
+      rgba(0, 0, 0, {{ block.settings.scanline_opacity | divided_by: 100.0 }}) {{ block.settings.scanline_spacing }}px,
+      rgba(0, 0, 0, {{ block.settings.scanline_opacity | divided_by: 100.0 }}) calc({{ block.settings.scanline_spacing }}px + 1px)
+    );
+    z-index: 1;
+  }
+
+  .ai-vhs-overlay-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='{{ block.settings.grain_intensity | divided_by: 10.0 }}' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: {{ block.settings.grain_opacity | divided_by: 100.0 }};
+    z-index: 2;
+  }
+
+  .ai-vhs-canvas-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+  }
+
+  {% if block.settings.enable_vignette %}
+    .ai-vhs-vignette-{{ ai_gen_id }} {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(
+        ellipse at center,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0) 60%,
+        rgba(0, 0, 0, {{ block.settings.vignette_intensity | divided_by: 100.0 }}) 100%
+      );
+      z-index: 4;
+    }
+  {% endif %}
+
+  {% if block.settings.enable_curvature %}
+    .ai-vhs-overlay-{{ ai_gen_id }} {
+      overflow: hidden;
+    }
+
+    .ai-vhs-canvas-{{ ai_gen_id }},
+    .ai-vhs-overlay-{{ ai_gen_id }}::before,
+    .ai-vhs-overlay-{{ ai_gen_id }}::after {
+      transform: scale(1.02);
+    }
+  {% endif %}
+{% endstyle %}
+
+<vhs-overlay-{{ ai_gen_id }} class="ai-vhs-overlay-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <canvas class="ai-vhs-canvas-{{ ai_gen_id }}"></canvas>
+  {% if block.settings.enable_vignette %}
+    <div class="ai-vhs-vignette-{{ ai_gen_id }}"></div>
+  {% endif %}
+</vhs-overlay-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class VhsOverlay{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.canvas = this.querySelector('.ai-vhs-canvas-{{ ai_gen_id }}');
+        this.ctx = this.canvas.getContext('2d');
+        this.animationId = null;
+        this.settings = {
+          enableFlicker: {{ block.settings.enable_flicker }},
+          flickerIntensity: {{ block.settings.flicker_intensity }},
+          enableRgbShift: {{ block.settings.enable_rgb_shift }},
+          rgbShiftIntensity: {{ block.settings.rgb_shift_intensity }}
+        };
+        this.time = 0;
+      }
+
+      connectedCallback() {
+        this.resizeCanvas();
+        window.addEventListener('resize', () => this.resizeCanvas());
+        
+        if (this.settings.enableFlicker || this.settings.enableRgbShift) {
+          this.animate();
+        }
+      }
+
+      disconnectedCallback() {
+        if (this.animationId) {
+          cancelAnimationFrame(this.animationId);
+        }
+        window.removeEventListener('resize', () => this.resizeCanvas());
+      }
+
+      resizeCanvas() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+
+      animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.time += 0.016;
+
+        if (this.settings.enableFlicker) {
+          this.drawFlicker();
+        }
+
+        if (this.settings.enableRgbShift) {
+          this.drawRgbShift();
+        }
+
+        this.animationId = requestAnimationFrame(() => this.animate());
+      }
+
+      drawFlicker() {
+        if (Math.random() > 0.96) {
+          const intensity = this.settings.flickerIntensity / 100;
+          const alpha = Math.random() * intensity * 0.03;
+          this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+          this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+      }
+
+      drawRgbShift() {
+        const intensity = this.settings.rgbShiftIntensity / 100;
+        const shift = Math.sin(this.time * 0.5) * intensity * 2;
+        
+        if (Math.abs(shift) > 0.5) {
+          const y = Math.random() * this.canvas.height;
+          const height = 1;
+          
+          this.ctx.fillStyle = `rgba(255, 0, 0, ${intensity * 0.15})`;
+          this.ctx.fillRect(shift, y, this.canvas.width, height);
+          
+          this.ctx.fillStyle = `rgba(0, 255, 255, ${intensity * 0.15})`;
+          this.ctx.fillRect(-shift, y, this.canvas.width, height);
+        }
+      }
+    }
+
+    customElements.define('vhs-overlay-{{ ai_gen_id }}', VhsOverlay{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "VHS overlay effect",
+  "settings": [
+    {
+      "type": "header",
+      "content": "General settings"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay opacity",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "z_index",
+      "min": 100,
+      "max": 9900,
+      "step": 100,
+      "label": "Layer position",
+      "default": 9900
+    },
+    {
+      "type": "header",
+      "content": "Scan lines"
+    },
+    {
+      "type": "range",
+      "id": "scanline_spacing",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "Spacing",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "scanline_opacity",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "%",
+      "label": "Opacity",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Film grain"
+    },
+    {
+      "type": "range",
+      "id": "grain_intensity",
+      "min": 5,
+      "max": 15,
+      "step": 1,
+      "label": "Intensity",
+      "default": 9
+    },
+    {
+      "type": "range",
+      "id": "grain_opacity",
+      "min": 0,
+      "max": 30,
+      "step": 5,
+      "unit": "%",
+      "label": "Opacity",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "CRT effects"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_flicker",
+      "label": "Enable screen flicker",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "flicker_intensity",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "label": "Flicker intensity",
+      "default": 30
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_rgb_shift",
+      "label": "Enable RGB shift",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "rgb_shift_intensity",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "label": "RGB shift intensity",
+      "default": 40
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_curvature",
+      "label": "Enable screen curvature",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Vignette"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_vignette",
+      "label": "Enable vignette",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "vignette_intensity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Intensity",
+      "default": 25
+    }
+  ],
+  "presets": [
+    {
+      "name": "VHS overlay effect"
+    }
+  ]
+}
+{% endschema %}

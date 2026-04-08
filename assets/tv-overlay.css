@@ -1,0 +1,81 @@
+body {
+  background-color: #030303;
+}
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+body::before {
+  z-index: 1000;
+  opacity: 0.22;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.04) 0,
+      rgba(255, 255, 255, 0.04) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    radial-gradient(circle at center, transparent 55%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+body::after {
+  z-index: 1001;
+  opacity: 0.12;
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0.08) 65%),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 1px,
+      rgba(255, 255, 255, 0.025) 1px,
+      rgba(255, 255, 255, 0.025) 2px
+    );
+  animation: tv-flicker 0.2s steps(2) infinite, tv-jitter 7s infinite;
+}
+
+@keyframes tv-flicker {
+  0% {
+    opacity: 0.1;
+  }
+
+  35% {
+    opacity: 0.14;
+  }
+
+  70% {
+    opacity: 0.11;
+  }
+
+  100% {
+    opacity: 0.13;
+  }
+}
+
+@keyframes tv-jitter {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  20% {
+    transform: translate3d(0.4px, -0.6px, 0);
+  }
+
+  40% {
+    transform: translate3d(-0.7px, 0.3px, 0);
+  }
+
+  60% {
+    transform: translate3d(0.3px, 0.4px, 0);
+  }
+
+  80% {
+    transform: translate3d(-0.4px, -0.3px, 0);
+  }
+}

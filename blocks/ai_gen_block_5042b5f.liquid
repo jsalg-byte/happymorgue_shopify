@@ -1,0 +1,264 @@
+{% doc %}
+  @prompt
+    make an overlay that add noise like a old 80s film
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-film-grain-overlay-{{ ai_gen_id }} {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: {{ block.settings.z_index }};
+    opacity: {{ block.settings.grain_opacity | divided_by: 100.0 }};
+    mix-blend-mode: {{ block.settings.blend_mode }};
+  }
+
+  .ai-film-grain-canvas-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+  }
+
+  {% if block.settings.vignette_enabled %}
+    .ai-film-grain-overlay-{{ ai_gen_id }}::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(
+        ellipse at center,
+        transparent 0%,
+        transparent {{ block.settings.vignette_start }}%,
+        {{ block.settings.vignette_color }} 100%
+      );
+      opacity: {{ block.settings.vignette_opacity | divided_by: 100.0 }};
+      pointer-events: none;
+    }
+  {% endif %}
+{% endstyle %}
+
+<film-grain-overlay-{{ ai_gen_id }}
+  class="ai-film-grain-overlay-{{ ai_gen_id }}"
+  data-grain-intensity="{{ block.settings.grain_intensity }}"
+  data-grain-size="{{ block.settings.grain_size }}"
+  data-animation-speed="{{ block.settings.animation_speed }}"
+  {{ block.shopify_attributes }}
+>
+  <canvas class="ai-film-grain-canvas-{{ ai_gen_id }}"></canvas>
+</film-grain-overlay-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class FilmGrainOverlay{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.canvas = null;
+        this.ctx = null;
+        this.animationFrame = null;
+        this.lastFrameTime = 0;
+      }
+
+      connectedCallback() {
+        this.canvas = this.querySelector('.ai-film-grain-canvas-{{ ai_gen_id }}');
+        if (!this.canvas) return;
+
+        this.ctx = this.canvas.getContext('2d');
+        this.grainIntensity = parseFloat(this.dataset.grainIntensity) || 50;
+        this.grainSize = parseInt(this.dataset.grainSize) || 1;
+        this.animationSpeed = parseFloat(this.dataset.animationSpeed) || 60;
+        this.frameInterval = 1000 / this.animationSpeed;
+
+        this.resizeCanvas();
+        window.addEventListener('resize', this.resizeCanvas.bind(this));
+        this.animate(0);
+      }
+
+      disconnectedCallback() {
+        if (this.animationFrame) {
+          cancelAnimationFrame(this.animationFrame);
+        }
+        window.removeEventListener('resize', this.resizeCanvas.bind(this));
+      }
+
+      resizeCanvas() {
+        const scale = this.grainSize;
+        this.canvas.width = Math.ceil(window.innerWidth / scale);
+        this.canvas.height = Math.ceil(window.innerHeight / scale);
+      }
+
+      generateGrain() {
+        const imageData = this.ctx.createImageData(this.canvas.width, this.canvas.height);
+        const data = imageData.data;
+        const intensity = this.grainIntensity / 100;
+
+        for (let i = 0; i < data.length; i += 4) {
+          const noise = (Math.random() - 0.5) * 255 * intensity;
+          const value = 128 + noise;
+          
+          data[i] = value;
+          data[i + 1] = value;
+          data[i + 2] = value;
+          data[i + 3] = 255;
+        }
+
+        this.ctx.putImageData(imageData, 0, 0);
+      }
+
+      animate(currentTime) {
+        this.animationFrame = requestAnimationFrame(this.animate.bind(this));
+
+        const elapsed = currentTime - this.lastFrameTime;
+
+        if (elapsed > this.frameInterval) {
+          this.lastFrameTime = currentTime - (elapsed % this.frameInterval);
+          this.generateGrain();
+        }
+      }
+    }
+
+    customElements.define('film-grain-overlay-{{ ai_gen_id }}', FilmGrainOverlay{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Film grain overlay",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Grain settings"
+    },
+    {
+      "type": "range",
+      "id": "grain_intensity",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Grain intensity",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "grain_opacity",
+      "min": 5,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Grain opacity",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "grain_size",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grain size",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "animation_speed",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "fps",
+      "label": "Animation speed",
+      "default": 30
+    },
+    {
+      "type": "select",
+      "id": "blend_mode",
+      "label": "Blend mode",
+      "options": [
+        {
+          "value": "overlay",
+          "label": "Overlay"
+        },
+        {
+          "value": "multiply",
+          "label": "Multiply"
+        },
+        {
+          "value": "screen",
+          "label": "Screen"
+        },
+        {
+          "value": "soft-light",
+          "label": "Soft light"
+        },
+        {
+          "value": "hard-light",
+          "label": "Hard light"
+        }
+      ],
+      "default": "overlay"
+    },
+    {
+      "type": "header",
+      "content": "Vignette"
+    },
+    {
+      "type": "checkbox",
+      "id": "vignette_enabled",
+      "label": "Enable vignette",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "vignette_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Vignette opacity",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "vignette_start",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Vignette start",
+      "default": 50
+    },
+    {
+      "type": "color",
+      "id": "vignette_color",
+      "label": "Vignette color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "range",
+      "id": "z_index",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "label": "Layer position",
+      "default": 99
+    }
+  ],
+  "presets": [
+    {
+      "name": "Film grain overlay"
+    }
+  ]
+}
+{% endschema %}

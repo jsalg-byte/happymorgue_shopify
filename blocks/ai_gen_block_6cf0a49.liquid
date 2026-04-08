@@ -1,0 +1,289 @@
+{% doc %}
+  @prompt
+    Create a full-screen overlay with crawling ants. Use position fixed with pointer-events none and z-index 9999. Create 12 img elements with an image picker setting. Each img must have style: background: none, background-color: transparent. Animate using CSS keyframes with transform translateX and translateY only - no rotation. Each ant moves from random edge to opposite edge at different speeds between 8-20 seconds. Size images at 40px width with height auto, ok just make me a overlay that gives everything a 80s tv glow feel , make it more tv like , make it have active noise like a old vhs player
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-vhs-overlay-{{ ai_gen_id }} {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+  }
+
+  .ai-vhs-scanlines-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 1px,
+      rgba(0, 0, 0, {{ block.settings.scanline_intensity }}) 1px,
+      rgba(0, 0, 0, {{ block.settings.scanline_intensity }}) 2px
+    );
+    z-index: 2;
+  }
+
+  .ai-vhs-vignette-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      rgba(0, 0, 0, {{ block.settings.vignette_intensity }}) 100%
+    );
+    z-index: 1;
+  }
+
+  .ai-vhs-glow-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: {{ block.settings.glow_color }};
+    opacity: {{ block.settings.glow_opacity }};
+    mix-blend-mode: screen;
+    z-index: 3;
+  }
+
+  .ai-vhs-curvature-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: 
+      inset 0 0 {{ block.settings.edge_glow }}px {{ block.settings.glow_color }},
+      inset 0 0 100px rgba(0, 0, 0, 0.5);
+    border-radius: 2%;
+    z-index: 4;
+  }
+
+  .ai-vhs-tracking-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      rgba(255, 255, 255, 0.03) 1px,
+      transparent 2px,
+      transparent 3px
+    );
+    z-index: 5;
+    animation: ai-vhs-tracking-shift-{{ ai_gen_id }} 0.5s infinite;
+  }
+
+  .ai-vhs-glitch-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(255, 255, 255, 0.8),
+      transparent
+    );
+    z-index: 6;
+    animation: ai-vhs-glitch-move-{{ ai_gen_id }} 3s linear infinite;
+  }
+
+  @keyframes ai-vhs-tracking-shift-{{ ai_gen_id }} {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(4px);
+    }
+  }
+
+  @keyframes ai-vhs-glitch-move-{{ ai_gen_id }} {
+    0% {
+      top: 10%;
+      opacity: 0;
+    }
+    5% {
+      opacity: 1;
+    }
+    10% {
+      top: 30%;
+    }
+    15% {
+      opacity: 0;
+    }
+    20% {
+      top: 50%;
+      opacity: 0;
+    }
+    25% {
+      opacity: 1;
+    }
+    30% {
+      top: 70%;
+    }
+    35% {
+      opacity: 0;
+    }
+    100% {
+      top: 90%;
+      opacity: 0;
+    }
+  }
+{% endstyle %}
+
+<vhs-noise-{{ ai_gen_id }} class="ai-vhs-overlay-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-vhs-vignette-{{ ai_gen_id }}"></div>
+  <div class="ai-vhs-scanlines-{{ ai_gen_id }}"></div>
+  <div class="ai-vhs-glow-{{ ai_gen_id }}"></div>
+  <div class="ai-vhs-curvature-{{ ai_gen_id }}"></div>
+  <div class="ai-vhs-tracking-{{ ai_gen_id }}"></div>
+  <div class="ai-vhs-glitch-{{ ai_gen_id }}"></div>
+  <canvas class="ai-vhs-noise-canvas-{{ ai_gen_id }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 7; opacity: {{ block.settings.noise_intensity }};"></canvas>
+</vhs-noise-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class VhsNoise{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.canvas = null;
+        this.ctx = null;
+        this.animationId = null;
+      }
+
+      connectedCallback() {
+        this.canvas = this.querySelector('.ai-vhs-noise-canvas-{{ ai_gen_id }}');
+        if (!this.canvas) return;
+
+        this.ctx = this.canvas.getContext('2d');
+        this.resizeCanvas();
+        this.animate();
+
+        window.addEventListener('resize', () => this.resizeCanvas());
+      }
+
+      disconnectedCallback() {
+        if (this.animationId) {
+          cancelAnimationFrame(this.animationId);
+        }
+        window.removeEventListener('resize', () => this.resizeCanvas());
+      }
+
+      resizeCanvas() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+
+      drawNoise() {
+        const imageData = this.ctx.createImageData(this.canvas.width, this.canvas.height);
+        const buffer = new Uint32Array(imageData.data.buffer);
+        const len = buffer.length;
+
+        for (let i = 0; i < len; i++) {
+          if (Math.random() < 0.5) {
+            const gray = Math.random() * 255;
+            buffer[i] = (255 << 24) | (gray << 16) | (gray << 8) | gray;
+          }
+        }
+
+        this.ctx.putImageData(imageData, 0, 0);
+      }
+
+      animate() {
+        this.drawNoise();
+        this.animationId = requestAnimationFrame(() => this.animate());
+      }
+    }
+
+    customElements.define('vhs-noise-{{ ai_gen_id }}', VhsNoise{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "VHS overlay",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Glow effect"
+    },
+    {
+      "type": "color",
+      "id": "glow_color",
+      "label": "Glow color",
+      "default": "#00ffc8"
+    },
+    {
+      "type": "range",
+      "id": "glow_opacity",
+      "min": 0,
+      "max": 0.5,
+      "step": 0.1,
+      "label": "Glow opacity",
+      "default": 0.1
+    },
+    {
+      "type": "range",
+      "id": "edge_glow",
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "label": "Edge glow size",
+      "default": 150
+    },
+    {
+      "type": "header",
+      "content": "VHS effects"
+    },
+    {
+      "type": "range",
+      "id": "scanline_intensity",
+      "min": 0,
+      "max": 0.5,
+      "step": 0.1,
+      "label": "Scanline intensity",
+      "default": 0.2
+    },
+    {
+      "type": "range",
+      "id": "vignette_intensity",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "label": "Vignette intensity",
+      "default": 0.5
+    },
+    {
+      "type": "range",
+      "id": "noise_intensity",
+      "min": 0,
+      "max": 0.5,
+      "step": 0.1,
+      "label": "Static noise intensity",
+      "default": 0.2
+    }
+  ],
+  "presets": [
+    {
+      "name": "VHS overlay"
+    }
+  ]
+}
+{% endschema %}

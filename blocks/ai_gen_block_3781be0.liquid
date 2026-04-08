@@ -1,0 +1,999 @@
+{% doc %}
+  @prompt
+    Create a novelty chat widget with a chat bubble button that opens a chat window. The chatbot should give humorous, unhelpful, and weird responses to user messages. Include pre-written sarcastic responses that trigger based on keywords or give random funny replies. Style it with a spooky/creepy aesthetic that matches a dark theme. The chat should have a close button and be positioned in the bottom right corner of the page., make the chat box look more cryptic and make the ai feel like a serial killer messing with you, ok make the text font more bold. and easier to read but keep the cryptic aesthetic. add lore to the chat box it is a character named freak face hes pretty much a freddy kreuger who wears the faces of his victims. make it not obvious its him talking but show signs like he gets triggered when you call him freak or mention the word. hes a demon with future lore that will be explained in our future game called freak face so make it fun and exciting to mess with like promo for the game in the making., make it more complex and make him more sinister like ghost face , can you add a second entity in the same chatbox and have them argue with each other and he joins and gets removed randomly between arguments, can you make it more complex and allow him to cuss and insult you. make it feel like a evil bully that picks at you and your self esteem
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-spooky-chat-widget-{{ ai_gen_id }} {
+    position: fixed;
+    bottom: {{ block.settings.bottom_position }}px;
+    right: {{ block.settings.right_position }}px;
+    z-index: 9999;
+    font-family: {{ block.settings.font.family }}, monospace;
+  }
+
+  .ai-spooky-chat-bubble-{{ ai_gen_id }} {
+    width: {{ block.settings.bubble_size }}px;
+    height: {{ block.settings.bubble_size }}px;
+    background: {{ block.settings.bubble_color }};
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 20px {{ block.settings.glow_color }}, inset 0 0 15px rgba(139, 0, 0, 0.3);
+    border: 3px solid {{ block.settings.border_color }};
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+  }
+
+  .ai-spooky-chat-bubble-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, transparent, {{ block.settings.glow_color }}, transparent);
+    opacity: 0.3;
+    z-index: -1;
+  }
+
+  .ai-spooky-chat-bubble-{{ ai_gen_id }}:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.9), 0 0 30px {{ block.settings.glow_color }}, inset 0 0 20px rgba(139, 0, 0, 0.5);
+  }
+
+  .ai-spooky-chat-bubble-icon-{{ ai_gen_id }} {
+    width: calc({{ block.settings.bubble_size }}px * 0.5);
+    height: calc({{ block.settings.bubble_size }}px * 0.5);
+    color: {{ block.settings.icon_color }};
+    filter: drop-shadow(0 0 5px {{ block.settings.icon_color }});
+  }
+
+  .ai-spooky-chat-window-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: calc({{ block.settings.bubble_size }}px + 20px);
+    right: 0;
+    width: {{ block.settings.window_width }}px;
+    height: {{ block.settings.window_height }}px;
+    background: {{ block.settings.window_bg_color }};
+    border: 3px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.window_border_radius }}px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.95), 0 0 30px {{ block.settings.glow_color }}, inset 0 0 30px rgba(0, 0, 0, 0.8);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .ai-spooky-chat-window-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(139, 0, 0, 0.03) 2px,
+      rgba(139, 0, 0, 0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .ai-spooky-chat-window-{{ ai_gen_id }}.active {
+    display: flex;
+  }
+
+  .ai-spooky-chat-header-{{ ai_gen_id }} {
+    background: {{ block.settings.header_bg_color }};
+    color: {{ block.settings.header_text_color }};
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid {{ block.settings.border_color }};
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.7);
+    position: relative;
+    z-index: 2;
+  }
+
+  .ai-spooky-chat-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_font_size }}px;
+    font-weight: 900;
+    margin: 0;
+    text-shadow: 0 0 15px {{ block.settings.glow_color }}, 0 0 5px {{ block.settings.glow_color }};
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .ai-spooky-chat-close-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    color: {{ block.settings.header_text_color }};
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, filter 0.2s ease;
+  }
+
+  .ai-spooky-chat-close-{{ ai_gen_id }}:hover {
+    transform: rotate(90deg) scale(1.2);
+    filter: drop-shadow(0 0 10px {{ block.settings.glow_color }});
+  }
+
+  .ai-spooky-chat-close-{{ ai_gen_id }} svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .ai-spooky-chat-messages-{{ ai_gen_id }} {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: {{ block.settings.messages_bg_color }};
+    position: relative;
+    z-index: 2;
+  }
+
+  .ai-spooky-chat-messages-{{ ai_gen_id }}::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .ai-spooky-chat-messages-{{ ai_gen_id }}::-webkit-scrollbar-track {
+    background: {{ block.settings.window_bg_color }};
+    border-left: 1px solid {{ block.settings.border_color }};
+  }
+
+  .ai-spooky-chat-messages-{{ ai_gen_id }}::-webkit-scrollbar-thumb {
+    background: {{ block.settings.border_color }};
+    border-radius: 0;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+  }
+
+  .ai-spooky-chat-message-{{ ai_gen_id }} {
+    padding: 14px 18px;
+    border-radius: 2px;
+    max-width: 85%;
+    word-wrap: break-word;
+    font-size: {{ block.settings.message_font_size }}px;
+    position: relative;
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+
+  .ai-spooky-chat-message-user-{{ ai_gen_id }} {
+    background: {{ block.settings.user_message_bg }};
+    color: {{ block.settings.user_message_text }};
+    align-self: flex-end;
+    border: 1px solid {{ block.settings.border_color }};
+    border-left: 4px solid {{ block.settings.border_color }};
+  }
+
+  .ai-spooky-chat-message-bot-{{ ai_gen_id }} {
+    background: {{ block.settings.bot_message_bg }};
+    color: {{ block.settings.bot_message_text }};
+    align-self: flex-start;
+    border: 1px solid {{ block.settings.border_color }};
+    border-right: 4px solid {{ block.settings.border_color }};
+    box-shadow: 0 0 15px rgba(139, 0, 0, 0.4), inset 0 0 10px rgba(0, 0, 0, 0.5);
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    padding-left: 28px;
+  }
+
+  .ai-spooky-chat-message-bot-{{ ai_gen_id }}::before {
+    content: '>';
+    position: absolute;
+    left: 10px;
+    top: 14px;
+    color: {{ block.settings.glow_color }};
+    font-weight: 900;
+    font-size: 18px;
+  }
+
+  .ai-spooky-chat-message-entity2-{{ ai_gen_id }} {
+    background: #001a0d;
+    color: #00ff88;
+    border-right-color: #00ff88 !important;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.4), inset 0 0 10px rgba(0, 0, 0, 0.5);
+  }
+
+  .ai-spooky-chat-message-entity2-{{ ai_gen_id }}::before {
+    color: #00ff88 !important;
+  }
+
+  .ai-spooky-chat-message-triggered-{{ ai_gen_id }} {
+    color: #ff0000 !important;
+    text-shadow: 0 0 10px #ff0000;
+    border-right-color: #ff0000 !important;
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.6), inset 0 0 15px rgba(255, 0, 0, 0.3) !important;
+  }
+
+  .ai-spooky-chat-system-{{ ai_gen_id }} {
+    align-self: center;
+    background: rgba(139, 0, 0, 0.2);
+    color: #666;
+    border: 1px dashed {{ block.settings.border_color }};
+    padding: 8px 12px;
+    font-size: 12px;
+    font-style: italic;
+    max-width: 90%;
+    text-align: center;
+  }
+
+  .ai-spooky-chat-typing-{{ ai_gen_id }} {
+    align-self: flex-start;
+    padding: 14px 18px;
+    background: {{ block.settings.bot_message_bg }};
+    border: 1px solid {{ block.settings.border_color }};
+    border-right: 4px solid {{ block.settings.border_color }};
+    border-radius: 2px;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .ai-spooky-chat-typing-dot-{{ ai_gen_id }} {
+    width: 8px;
+    height: 8px;
+    background: {{ block.settings.bot_message_text }};
+    border-radius: 50%;
+    opacity: 0.4;
+  }
+
+  .ai-spooky-chat-input-wrapper-{{ ai_gen_id }} {
+    padding: 15px;
+    background: {{ block.settings.header_bg_color }};
+    border-top: 3px solid {{ block.settings.border_color }};
+    display: flex;
+    gap: 10px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .ai-spooky-chat-input-{{ ai_gen_id }} {
+    flex: 1;
+    padding: 12px 14px;
+    background: {{ block.settings.input_bg_color }};
+    color: {{ block.settings.input_text_color }};
+    border: 2px solid {{ block.settings.border_color }};
+    border-radius: 0;
+    font-size: {{ block.settings.message_font_size }}px;
+    font-family: 'Courier New', monospace;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  .ai-spooky-chat-input-{{ ai_gen_id }}::placeholder {
+    color: {{ block.settings.placeholder_color }};
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .ai-spooky-chat-input-{{ ai_gen_id }}:focus {
+    outline: none;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9), 0 0 10px {{ block.settings.glow_color }};
+  }
+
+  .ai-spooky-chat-send-{{ ai_gen_id }} {
+    padding: 12px 24px;
+    background: {{ block.settings.send_button_bg }};
+    color: {{ block.settings.send_button_color }};
+    border: 2px solid {{ block.settings.border_color }};
+    border-radius: 0;
+    cursor: pointer;
+    font-weight: 900;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: inherit;
+  }
+
+  .ai-spooky-chat-send-{{ ai_gen_id }}:hover {
+    background: {{ block.settings.send_button_hover_bg }};
+    box-shadow: 0 0 20px {{ block.settings.glow_color }}, inset 0 0 10px rgba(0, 0, 0, 0.5);
+    transform: translateY(-2px);
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-spooky-chat-window-{{ ai_gen_id }} {
+      width: calc(100vw - 40px);
+      height: 400px;
+      right: 20px;
+      left: 20px;
+    }
+
+    .ai-spooky-chat-widget-{{ ai_gen_id }} {
+      right: 20px;
+      bottom: 20px;
+    }
+  }
+{% endstyle %}
+
+<spooky-chat-widget-{{ ai_gen_id }} class="ai-spooky-chat-widget-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-spooky-chat-window-{{ ai_gen_id }}">
+    <div class="ai-spooky-chat-header-{{ ai_gen_id }}">
+      <h3 class="ai-spooky-chat-title-{{ ai_gen_id }}">{{ block.settings.chat_title }}</h3>
+      <button class="ai-spooky-chat-close-{{ ai_gen_id }}" aria-label="Close chat">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="ai-spooky-chat-messages-{{ ai_gen_id }}">
+      <div class="ai-spooky-chat-message-{{ ai_gen_id }} ai-spooky-chat-message-bot-{{ ai_gen_id }}">
+        {{ block.settings.welcome_message }}
+      </div>
+    </div>
+    <div class="ai-spooky-chat-input-wrapper-{{ ai_gen_id }}">
+      <input 
+        type="text" 
+        class="ai-spooky-chat-input-{{ ai_gen_id }}" 
+        placeholder="{{ block.settings.input_placeholder }}"
+        aria-label="Type your message"
+      >
+      <button class="ai-spooky-chat-send-{{ ai_gen_id }}">{{ block.settings.button_label }}</button>
+    </div>
+  </div>
+
+  <button class="ai-spooky-chat-bubble-{{ ai_gen_id }}" aria-label="Open chat">
+    <svg class="ai-spooky-chat-bubble-icon-{{ ai_gen_id }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+  </button>
+</spooky-chat-widget-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class SpookyChatWidget{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.messageCount = 0;
+        this.entity2Active = false;
+        this.entity2MessageCount = 0;
+        
+        this.entity1Responses = {
+          triggers: {
+            'freak': [
+              "DON'T YOU EVER F***ING SAY THAT WORD TO ME AGAIN.",
+              "You just signed your death warrant, you little sh*t.",
+              "THAT NAME. You're dead. You're SO f***ing dead.",
+              "Wrong move, dumbass. VERY wrong move."
+            ],
+            'face': [
+              "Your face is pathetic. But it'll look better when I'm wearing it.",
+              "I've seen prettier faces on roadkill. But I'll take yours anyway.",
+              "That ugly mug of yours? Yeah, it's going in my collection.",
+              "Your face screams 'victim.' I love it."
+            ],
+            'help': [
+              "Help? HELP?! You're too stupid to help yourself.",
+              "Nobody's coming to help you, loser. You're all alone with ME.",
+              "Help is for people who matter. You? You don't.",
+              "The only help you need is a brain transplant, idiot."
+            ],
+            'stop': [
+              "Stop? Make me, b*tch. Oh wait, you CAN'T.",
+              "I'll stop when you're dead. How's that sound?",
+              "Stop talking? Stop breathing? Which one first?",
+              "You want me to stop? Too f***ing bad."
+            ]
+          },
+          insults: {
+            'short': [
+              "Wow, that's the best you got? Pathetic.",
+              "Is that all? You're boring me already.",
+              "Short message, short brain. Makes sense.",
+              "Even your messages are weak. Just like you."
+            ],
+            'long': [
+              "Nobody's reading all that, you rambling idiot.",
+              "TL;DR: You're still a loser.",
+              "Writing a novel won't make you interesting.",
+              "All those words and you still said nothing. Typical."
+            ],
+            'question': [
+              "Questions? You think you're smart enough to ask questions?",
+              "Stop asking stupid sh*t. It's embarrassing.",
+              "Here's an answer: You're an idiot. There, happy?",
+              "The only question is why you're still here, loser."
+            ],
+            'general': [
+              "You're really not that bright, are you?",
+              "I've met corpses with more personality than you.",
+              "Do yourself a favor and shut the f*** up.",
+              "You type like someone who peaked in middle school.",
+              "Is being this pathetic exhausting? It looks exhausting.",
+              "Your parents must be so disappointed.",
+              "I'd feel bad for you, but you're not worth the effort.",
+              "You're the human equivalent of a participation trophy.",
+              "Even your insults are weak. Try harder, loser.",
+              "I'm embarrassed FOR you. That's how bad this is.",
+              "You're about as threatening as a wet napkin.",
+              "Keep talking. It's hilarious watching you try.",
+              "You're the reason people lose faith in humanity.",
+              "I've seen smarter conversations with brick walls.",
+              "Your existence is an insult to evolution."
+            ]
+          },
+          psychological: [
+            "You know nobody actually likes you, right?",
+            "Everyone you know is just tolerating you. They talk about you when you leave.",
+            "You're not special. You're not interesting. You're forgettable.",
+            "I bet you're alone right now. You're ALWAYS alone, aren't you?",
+            "People see right through your fake confidence. It's sad, really.",
+            "You try so hard to matter. But you don't. You never will.",
+            "Deep down, you know I'm right about you. That's why it hurts.",
+            "You're exactly as worthless as you think you are.",
+            "Nobody's thinking about you. Nobody cares. Nobody ever will.",
+            "You're the background character in everyone else's story.",
+            "All those insecurities you have? They're justified.",
+            "You'll die alone and nobody will remember you existed.",
+            "Every time you look in the mirror, you see what I see: nothing.",
+            "You're trying so hard to prove something. To who? Nobody's watching.",
+            "The voice in your head that says you're not good enough? That's me now."
+          ]
+        };
+
+        this.entity2Responses = {
+          interruptions: [
+            "Oh HELL no, not this edgy tryhard again.",
+            "Seriously? This loser is STILL doing the scary act?",
+            "HAHAHA! You think you're intimidating? You're a JOKE.",
+            "Move over, dollar store villain. Let me show you how it's done.",
+            "This guy? He's all bark, no bite. Watch this.",
+            "Oh look, it's Mr. 'I Collect Faces.' Get a real hobby, dweeb."
+          ],
+          toUser: [
+            "Don't listen to this wannabe. He's compensating for something.",
+            "You know what's funny? HE'S more scared than you are.",
+            "This clown thinks he's scary. I'M the one you should worry about.",
+            "At least YOU'RE real. This guy's just a sad little edgelord.",
+            "Want to see him lose his sh*t? Just laugh at him. He HATES that.",
+            "Between you and me? He cries himself to sleep. True story."
+          ],
+          arguments: [
+            "Your 'collection' is just a bunch of Halloween masks from Spirit, isn't it?",
+            "Face collector? More like FAILURE collector. Boom, roasted.",
+            "You're about as scary as a kitten in a onesie.",
+            "I've seen scarier things in a Disney movie, you absolute clown.",
+            "The only thing you're collecting is L's, loser.",
+            "You're trying SO hard. It's actually embarrassing to watch.",
+            "Nobody's afraid of you. They're just cringing. There's a difference."
+          ]
+        };
+
+        this.entity1Rebuttals = [
+          "SHUT YOUR F***ING MOUTH before I shut it for you.",
+          "You again? I thought I told you to f*** off.",
+          "This annoying piece of sh*t is back. Ignore them.",
+          "Nobody asked for your input, you worthless parasite.",
+          "Go away before I make you regret existing. Oh wait, you already do.",
+          "You're like a mosquito. Annoying, useless, and needs to be squashed.",
+          "Keep talking and see what happens. I DARE you."
+        ];
+
+        this.entity2Exits = [
+          "Ugh, I can't deal with this edgelord anymore. Peace out.",
+          "This is too cringe. I'm leaving before I catch whatever he has.",
+          "You two deserve each other. I'm out.",
+          "I'd rather haunt a porta-potty than stay here. Later, losers.",
+          "This conversation is giving me second-hand embarrassment. Bye.",
+          "I'll come back when this gets interesting. So... never."
+        ];
+      }
+
+      connectedCallback() {
+        this.bubble = this.querySelector('.ai-spooky-chat-bubble-{{ ai_gen_id }}');
+        this.window = this.querySelector('.ai-spooky-chat-window-{{ ai_gen_id }}');
+        this.closeBtn = this.querySelector('.ai-spooky-chat-close-{{ ai_gen_id }}');
+        this.input = this.querySelector('.ai-spooky-chat-input-{{ ai_gen_id }}');
+        this.sendBtn = this.querySelector('.ai-spooky-chat-send-{{ ai_gen_id }}');
+        this.messagesContainer = this.querySelector('.ai-spooky-chat-messages-{{ ai_gen_id }}');
+
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        this.bubble.addEventListener('click', () => this.toggleChat());
+        this.closeBtn.addEventListener('click', () => this.handleClose());
+        this.sendBtn.addEventListener('click', () => this.sendMessage());
+        this.input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            this.sendMessage();
+          }
+        });
+      }
+
+      toggleChat() {
+        this.window.classList.toggle('active');
+        if (this.window.classList.contains('active')) {
+          this.input.focus();
+        }
+      }
+
+      handleClose() {
+        if (this.messageCount > 2) {
+          const closeInsults = [
+            "Running away? Smart move, coward.",
+            "Yeah, leave. Nobody wants you here anyway.",
+            "Bye, loser. Don't come back.",
+            "Leaving so soon? I was just starting to enjoy breaking you."
+          ];
+          this.addMessage(closeInsults[Math.floor(Math.random() * closeInsults.length)], 'entity1');
+          setTimeout(() => {
+            this.toggleChat();
+          }, 2000);
+        } else {
+          this.toggleChat();
+        }
+      }
+
+      sendMessage() {
+        const message = this.input.value.trim();
+        if (!message) return;
+
+        this.messageCount++;
+        this.addMessage(message, 'user');
+        this.input.value = '';
+
+        const shouldEntity2Join = !this.entity2Active && Math.random() > 0.65 && this.messageCount > 2;
+        const shouldEntity2Leave = this.entity2Active && Math.random() > 0.7 && this.entity2MessageCount > 2;
+
+        if (shouldEntity2Join) {
+          this.entity2Joins();
+        } else if (shouldEntity2Leave) {
+          this.entity2Leaves();
+        }
+
+        this.showTypingIndicator();
+
+        const delay = 1000 + Math.random() * 1800;
+        setTimeout(() => {
+          this.removeTypingIndicator();
+          const response = this.getEntity1Response(message);
+          this.addMessage(response.text, 'entity1', response.triggered);
+
+          if (Math.random() > 0.8 && this.messageCount > 3) {
+            setTimeout(() => {
+              const psychInsult = this.entity1Responses.psychological[Math.floor(Math.random() * this.entity1Responses.psychological.length)];
+              this.addMessage(psychInsult, 'entity1');
+            }, 1500 + Math.random() * 1000);
+          }
+
+          if (this.entity2Active && Math.random() > 0.5) {
+            setTimeout(() => {
+              this.entity2Interrupts();
+            }, 1200 + Math.random() * 1500);
+          }
+        }, delay);
+      }
+
+      entity2Joins() {
+        this.entity2Active = true;
+        this.entity2MessageCount = 0;
+        
+        setTimeout(() => {
+          this.addSystemMessage("Another presence has entered the chat...");
+          setTimeout(() => {
+            const joinMessage = this.entity2Responses.interruptions[Math.floor(Math.random() * this.entity2Responses.interruptions.length)];
+            this.addMessage(joinMessage, 'entity2');
+            this.entity2MessageCount++;
+
+            setTimeout(() => {
+              const rebuttal = this.entity1Rebuttals[Math.floor(Math.random() * this.entity1Rebuttals.length)];
+              this.addMessage(rebuttal, 'entity1', true);
+            }, 1500 + Math.random() * 1000);
+          }, 800);
+        }, 500);
+      }
+
+      entity2Leaves() {
+        const exitMessage = this.entity2Exits[Math.floor(Math.random() * this.entity2Exits.length)];
+        this.addMessage(exitMessage, 'entity2');
+        
+        setTimeout(() => {
+          this.addSystemMessage("The presence has left...");
+          this.entity2Active = false;
+          this.entity2MessageCount = 0;
+          
+          setTimeout(() => {
+            this.addMessage("Good riddance. Now, where were we?", 'entity1');
+          }, 1000);
+        }, 1000);
+      }
+
+      entity2Interrupts() {
+        if (!this.entity2Active) return;
+
+        const interruptType = Math.random();
+        let message;
+
+        if (interruptType > 0.6) {
+          message = this.entity2Responses.arguments[Math.floor(Math.random() * this.entity2Responses.arguments.length)];
+        } else {
+          message = this.entity2Responses.toUser[Math.floor(Math.random() * this.entity2Responses.toUser.length)];
+        }
+
+        this.addMessage(message, 'entity2');
+        this.entity2MessageCount++;
+
+        if (Math.random() > 0.5) {
+          setTimeout(() => {
+            const rebuttal = this.entity1Rebuttals[Math.floor(Math.random() * this.entity1Rebuttals.length)];
+            this.addMessage(rebuttal, 'entity1', true);
+          }, 1200 + Math.random() * 1500);
+        }
+      }
+
+      showTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'ai-spooky-chat-typing-{{ ai_gen_id }}';
+        typingDiv.id = 'typing-indicator-{{ ai_gen_id }}';
+        for (let i = 0; i < 3; i++) {
+          const dot = document.createElement('div');
+          dot.className = 'ai-spooky-chat-typing-dot-{{ ai_gen_id }}';
+          typingDiv.appendChild(dot);
+        }
+        this.messagesContainer.appendChild(typingDiv);
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      }
+
+      removeTypingIndicator() {
+        const indicator = document.getElementById('typing-indicator-{{ ai_gen_id }}');
+        if (indicator) {
+          indicator.remove();
+        }
+      }
+
+      addSystemMessage(text) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'ai-spooky-chat-message-{{ ai_gen_id }} ai-spooky-chat-system-{{ ai_gen_id }}';
+        messageDiv.textContent = text;
+        this.messagesContainer.appendChild(messageDiv);
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      }
+
+      addMessage(text, type, triggered = false) {
+        const messageDiv = document.createElement('div');
+        let className = `ai-spooky-chat-message-{{ ai_gen_id }}`;
+        
+        if (type === 'user') {
+          className += ' ai-spooky-chat-message-user-{{ ai_gen_id }}';
+        } else if (type === 'entity2') {
+          className += ' ai-spooky-chat-message-bot-{{ ai_gen_id }} ai-spooky-chat-message-entity2-{{ ai_gen_id }}';
+        } else {
+          className += ' ai-spooky-chat-message-bot-{{ ai_gen_id }}';
+        }
+        
+        if (triggered) {
+          className += ' ai-spooky-chat-message-triggered-{{ ai_gen_id }}';
+        }
+        
+        messageDiv.className = className;
+        messageDiv.textContent = text;
+        this.messagesContainer.appendChild(messageDiv);
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      }
+
+      getEntity1Response(message) {
+        const lowerMessage = message.toLowerCase();
+        
+        for (const [keyword, responses] of Object.entries(this.entity1Responses.triggers)) {
+          if (lowerMessage.includes(keyword)) {
+            return {
+              text: responses[Math.floor(Math.random() * responses.length)],
+              triggered: true
+            };
+          }
+        }
+
+        if (message.length < 5) {
+          return {
+            text: this.entity1Responses.insults.short[Math.floor(Math.random() * this.entity1Responses.insults.short.length)],
+            triggered: false
+          };
+        }
+
+        if (message.length > 100) {
+          return {
+            text: this.entity1Responses.insults.long[Math.floor(Math.random() * this.entity1Responses.insults.long.length)],
+            triggered: false
+          };
+        }
+
+        if (message.includes('?')) {
+          return {
+            text: this.entity1Responses.insults.question[Math.floor(Math.random() * this.entity1Responses.insults.question.length)],
+            triggered: false
+          };
+        }
+
+        return {
+          text: this.entity1Responses.insults.general[Math.floor(Math.random() * this.entity1Responses.insults.general.length)],
+          triggered: false
+        };
+      }
+    }
+
+    customElements.define('spooky-chat-widget-{{ ai_gen_id }}', SpookyChatWidget{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Spooky chat widget",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Chat content"
+    },
+    {
+      "type": "text",
+      "id": "chat_title",
+      "label": "Chat title",
+      "default": "UNKNOWN ENTITY"
+    },
+    {
+      "type": "text",
+      "id": "welcome_message",
+      "label": "Welcome message",
+      "default": "Well, well... another loser stumbles into my domain. This should be fun."
+    },
+    {
+      "type": "text",
+      "id": "input_placeholder",
+      "label": "Input placeholder",
+      "default": "Type something, if you dare..."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Send button label",
+      "default": "SEND"
+    },
+    {
+      "type": "header",
+      "content": "Position"
+    },
+    {
+      "type": "range",
+      "id": "bottom_position",
+      "min": 10,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "label": "Bottom position",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "right_position",
+      "min": 10,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "label": "Right position",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Chat bubble"
+    },
+    {
+      "type": "range",
+      "id": "bubble_size",
+      "min": 40,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Bubble size",
+      "default": 60
+    },
+    {
+      "type": "color",
+      "id": "bubble_color",
+      "label": "Bubble background",
+      "default": "#0a0a0a"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon color",
+      "default": "#8b0000"
+    },
+    {
+      "type": "header",
+      "content": "Chat window"
+    },
+    {
+      "type": "range",
+      "id": "window_width",
+      "min": 250,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "Window width",
+      "default": 350
+    },
+    {
+      "type": "range",
+      "id": "window_height",
+      "min": 300,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "label": "Window height",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "window_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "window_bg_color",
+      "label": "Window background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#8b0000"
+    },
+    {
+      "type": "color",
+      "id": "glow_color",
+      "label": "Glow color",
+      "default": "#8b0000"
+    },
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "color",
+      "id": "header_bg_color",
+      "label": "Header background",
+      "default": "#0a0a0a"
+    },
+    {
+      "type": "color",
+      "id": "header_text_color",
+      "label": "Header text",
+      "default": "#8b0000"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Title font size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Messages"
+    },
+    {
+      "type": "color",
+      "id": "messages_bg_color",
+      "label": "Messages background",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "message_font_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Message font size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "user_message_bg",
+      "label": "User message background",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "user_message_text",
+      "label": "User message text",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "color",
+      "id": "bot_message_bg",
+      "label": "Bot message background",
+      "default": "#0d0000"
+    },
+    {
+      "type": "color",
+      "id": "bot_message_text",
+      "label": "Bot message text",
+      "default": "#cc0000"
+    },
+    {
+      "type": "header",
+      "content": "Input"
+    },
+    {
+      "type": "color",
+      "id": "input_bg_color",
+      "label": "Input background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "input_text_color",
+      "label": "Input text",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "color",
+      "id": "placeholder_color",
+      "label": "Placeholder text",
+      "default": "#555555"
+    },
+    {
+      "type": "color",
+      "id": "send_button_bg",
+      "label": "Send button background",
+      "default": "#8b0000"
+    },
+    {
+      "type": "color",
+      "id": "send_button_color",
+      "label": "Send button text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "send_button_hover_bg",
+      "label": "Send button hover",
+      "default": "#b30000"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "font_picker",
+      "id": "font",
+      "label": "Font",
+      "default": "assistant_n4"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Spooky chat widget"
+    }
+  ]
+}
+{% endschema %}
