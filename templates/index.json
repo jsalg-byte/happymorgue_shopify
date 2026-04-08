@@ -14,6 +14,7 @@
       "blocks": {
         "feature_shop": {
           "type": "feature",
+          "disabled": true,
           "settings": {
             "title": "Shop",
             "text": "Grab drops and merch from the collective.",
@@ -49,6 +50,36 @@
     },
     "17624535193cb88f04": {
       "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_112a929_rckLLD": {
+          "type": "ai_gen_block_112a929",
+          "name": "Clothing products",
+          "settings": {
+            "heading": "Shop",
+            "description": "",
+            "collection": "clothing",
+            "products_to_show": 12,
+            "columns_desktop": 4,
+            "columns_tablet": 3,
+            "columns_mobile": "2",
+            "text_alignment": "left",
+            "grid_gap": 36,
+            "max_width": 1500,
+            "background_color": "#000000",
+            "heading_color": "#121212",
+            "text_color": "#ffffff",
+            "price_color": "#ffffff",
+            "heading_size": 32,
+            "description_size": 16,
+            "image_radius": 0,
+            "section_padding": 40
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_112a929_rckLLD"
+      ],
       "settings": {}
     },
     "1762452594d4c90158": {
