@@ -1,6 +1,1030 @@
+{% doc %}
+  @prompt
+    Now a side scrolling section where we can put the past event fliers from our past events I want it to look like side scrolling movie posters make the amount unlimited so we can add as many as we need as we throw more events. Add it in a way where we can add the flier image for each event 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-event-fliers-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    background-color: {{ block.settings.background_color }};
+    padding: {{ block.settings.section_padding }}px 0;
+  }
+
+  .ai-event-fliers-container-{{ ai_gen_id }} {
+    width: 100%;
+    max-width: {{ block.settings.desktop_width_percent }}%;
+    margin: 0 auto;
+  }
+
+  .ai-event-fliers-header-{{ ai_gen_id }} {
+    text-align: {{ block.settings.heading_alignment }};
+    margin-bottom: {{ block.settings.heading_spacing }}px;
+    padding: 0 20px;
+  }
+
+  .ai-event-fliers-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.heading_size }}px;
+    color: {{ block.settings.heading_color }};
+    margin: 0;
+  }
+
+  .ai-event-fliers-scroll-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    overflow: hidden;
+    padding: 0 20px;
+  }
+
+  .ai-event-fliers-track-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.poster_gap }}px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 20px;
+  }
+
+  .ai-event-fliers-track-{{ ai_gen_id }}::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ai-event-fliers-poster-{{ ai_gen_id }} {
+    flex-shrink: 0;
+    width: {{ block.settings.poster_width }}px;
+    position: relative;
+    cursor: grab;
+    user-select: none;
+  }
+
+  .ai-event-fliers-poster-{{ ai_gen_id }}:active {
+    cursor: grabbing;
+  }
+
+  .ai-event-fliers-poster-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ block.settings.poster_aspect_ratio }};
+    border-radius: {{ block.settings.poster_border_radius }}px;
+    overflow: hidden;
+    box-shadow: {{ block.settings.shadow_horizontal }}px {{ block.settings.shadow_vertical }}px {{ block.settings.shadow_blur }}px rgba(0, 0, 0, {{ block.settings.shadow_opacity }});
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .ai-event-fliers-poster-{{ ai_gen_id }}:hover .ai-event-fliers-poster-wrapper-{{ ai_gen_id }} {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: {{ block.settings.shadow_horizontal | times: 1.5 }}px {{ block.settings.shadow_vertical | times: 1.5 }}px {{ block.settings.shadow_blur | times: 1.5 }}px rgba(0, 0, 0, {{ block.settings.shadow_opacity | times: 1.2 | at_most: 1 }});
+  }
+
+  .ai-event-fliers-poster-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-event-fliers-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-event-fliers-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-event-fliers-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 16px;
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+    pointer-events: none;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 4px;
+  }
+
+  .ai-event-fliers-nav-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: {{ block.settings.nav_button_color }};
+    color: {{ block.settings.nav_button_icon_color }};
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    opacity: 0.9;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .ai-event-fliers-nav-{{ ai_gen_id }}:hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  .ai-event-fliers-nav-{{ ai_gen_id }}:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .ai-event-fliers-nav-{{ ai_gen_id }}:disabled:hover {
+    transform: translateY(-50%) scale(1);
+  }
+
+  .ai-event-fliers-nav-prev-{{ ai_gen_id }} {
+    left: 0;
+  }
+
+  .ai-event-fliers-nav-next-{{ ai_gen_id }} {
+    right: 0;
+  }
+
+  .ai-event-fliers-nav-{{ ai_gen_id }} svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-event-fliers-poster-{{ ai_gen_id }} {
+      width: {{ block.settings.poster_width | times: 0.7 }}px;
+    }
+
+    .ai-event-fliers-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.heading_size | times: 0.8 }}px;
+    }
+
+    .ai-event-fliers-nav-{{ ai_gen_id }} {
+      width: 40px;
+      height: 40px;
+    }
+
+    .ai-event-fliers-nav-{{ ai_gen_id }} svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+{% endstyle %}
+
+<event-fliers-{{ ai_gen_id }} class="ai-event-fliers-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-event-fliers-container-{{ ai_gen_id }}">
+    {% if block.settings.heading != blank %}
+      <div class="ai-event-fliers-header-{{ ai_gen_id }}">
+        <h2 class="ai-event-fliers-title-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
+      </div>
+    {% endif %}
+
+    <div class="ai-event-fliers-scroll-wrapper-{{ ai_gen_id }}">
+      {% if block.settings.show_nav_buttons %}
+        <button
+          class="ai-event-fliers-nav-{{ ai_gen_id }} ai-event-fliers-nav-prev-{{ ai_gen_id }}"
+          aria-label="Previous"
+          data-direction="prev"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+      {% endif %}
+
+      <div class="ai-event-fliers-track-{{ ai_gen_id }}" data-track>
+        {% for i in (1..50) %}
+          {% liquid
+            assign flier_key = 'flier_' | append: i
+            assign flier = block.settings[flier_key]
+          %}
+
+          {% if flier != blank %}
+            <div class="ai-event-fliers-poster-{{ ai_gen_id }}">
+              <div class="ai-event-fliers-poster-wrapper-{{ ai_gen_id }}">
+                <img
+                  src="{{ flier | image_url: width: 800 }}"
+                  alt="Event flier {{ i }}"
+                  loading="lazy"
+                  width="800"
+                  height="{{ 800 | divided_by: block.settings.poster_aspect_ratio }}"
+                  class="ai-event-fliers-poster-image-{{ ai_gen_id }}"
+                >
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        {% assign has_fliers = false %}
+        {% for i in (1..50) %}
+          {% liquid
+            assign flier_key = 'flier_' | append: i
+            assign flier = block.settings[flier_key]
+          %}
+          {% if flier != blank %}
+            {% assign has_fliers = true %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+
+        {% if has_fliers == false %}
+          {% for i in (1..5) %}
+            <div class="ai-event-fliers-poster-{{ ai_gen_id }}">
+              <div class="ai-event-fliers-poster-wrapper-{{ ai_gen_id }}">
+                <div class="ai-event-fliers-placeholder-{{ ai_gen_id }}">
+                  {{ 'image' | placeholder_svg_tag }}
+                  {% if i == 3 %}
+                    <div class="ai-event-fliers-empty-state-{{ ai_gen_id }}">
+                      Add event fliers
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      {% if block.settings.show_nav_buttons %}
+        <button
+          class="ai-event-fliers-nav-{{ ai_gen_id }} ai-event-fliers-nav-next-{{ ai_gen_id }}"
+          aria-label="Next"
+          data-direction="next"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      {% endif %}
+    </div>
+  </div>
+</event-fliers-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class EventFliers{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.track = this.querySelector('[data-track]');
+        this.prevButton = this.querySelector('[data-direction="prev"]');
+        this.nextButton = this.querySelector('[data-direction="next"]');
+        this.isDragging = false;
+        this.startX = 0;
+        this.scrollLeft = 0;
+      }
+
+      connectedCallback() {
+        this.setupDragScroll();
+        this.setupNavButtons();
+        this.updateNavButtons();
+      }
+
+      setupDragScroll() {
+        this.track.addEventListener('mousedown', (e) => {
+          this.isDragging = true;
+          this.startX = e.pageX - this.track.offsetLeft;
+          this.scrollLeft = this.track.scrollLeft;
+        });
+
+        this.track.addEventListener('mouseleave', () => {
+          this.isDragging = false;
+        });
+
+        this.track.addEventListener('mouseup', () => {
+          this.isDragging = false;
+        });
+
+        this.track.addEventListener('mousemove', (e) => {
+          if (!this.isDragging) return;
+          e.preventDefault();
+          const x = e.pageX - this.track.offsetLeft;
+          const walk = (x - this.startX) * 2;
+          this.track.scrollLeft = this.scrollLeft - walk;
+        });
+
+        this.track.addEventListener('touchstart', (e) => {
+          this.startX = e.touches[0].pageX - this.track.offsetLeft;
+          this.scrollLeft = this.track.scrollLeft;
+        });
+
+        this.track.addEventListener('touchmove', (e) => {
+          const x = e.touches[0].pageX - this.track.offsetLeft;
+          const walk = (x - this.startX) * 2;
+          this.track.scrollLeft = this.scrollLeft - walk;
+        });
+
+        this.track.addEventListener('scroll', () => {
+          this.updateNavButtons();
+        });
+      }
+
+      setupNavButtons() {
+        if (this.prevButton) {
+          this.prevButton.addEventListener('click', () => {
+            const scrollAmount = this.track.offsetWidth * 0.8;
+            this.track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+          });
+        }
+
+        if (this.nextButton) {
+          this.nextButton.addEventListener('click', () => {
+            const scrollAmount = this.track.offsetWidth * 0.8;
+            this.track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+          });
+        }
+      }
+
+      updateNavButtons() {
+        if (!this.prevButton || !this.nextButton) return;
+
+        const isAtStart = this.track.scrollLeft <= 0;
+        const isAtEnd = this.track.scrollLeft + this.track.offsetWidth >= this.track.scrollWidth - 1;
+
+        this.prevButton.disabled = isAtStart;
+        this.nextButton.disabled = isAtEnd;
+      }
+    }
+
+    customElements.define('event-fliers-{{ ai_gen_id }}', EventFliers{{ ai_gen_id }});
+  })();
+</script>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Event fliers gallery",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Past Events"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "heading_spacing",
+      "label": "Heading spacing",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "Section padding",
+      "min": 20,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Poster style"
+    },
+    {
+      "type": "range",
+      "id": "poster_width",
+      "label": "Poster width",
+      "min": 200,
+      "max": 500,
+      "step": 20,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "select",
+      "id": "poster_aspect_ratio",
+      "label": "Poster aspect ratio",
+      "options": [
+        {
+          "value": "0.667",
+          "label": "Movie poster (2:3)"
+        },
+        {
+          "value": "0.707",
+          "label": "Classic poster (1:√2)"
+        },
+        {
+          "value": "0.75",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "1",
+          "label": "Square (1:1)"
+        }
+      ],
+      "default": "0.667"
+    },
+    {
+      "type": "range",
+      "id": "poster_gap",
+      "label": "Gap between posters",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "poster_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Shadow"
+    },
+    {
+      "type": "range",
+      "id": "shadow_horizontal",
+      "label": "Horizontal offset",
+      "min": -20,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "shadow_vertical",
+      "label": "Vertical offset",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "shadow_blur",
+      "label": "Blur",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "shadow_opacity",
+      "label": "Opacity",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0.5
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_nav_buttons",
+      "label": "Show navigation buttons",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "nav_button_color",
+      "label": "Button color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "nav_button_icon_color",
+      "label": "Icon color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_1",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_2",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_3",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_4",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_5",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_6",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_7",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_8",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 9"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_9",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 10"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_10",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 11"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_11",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 12"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_12",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 13"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_13",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 14"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_14",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 15"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_15",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 16"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_16",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 17"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_17",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 18"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_18",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 19"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_19",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 20"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_20",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 21"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_21",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 22"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_22",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 23"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_23",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 24"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_24",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 25"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_25",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 26"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_26",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 27"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_27",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 28"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_28",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 29"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_29",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 30"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_30",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 31"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_31",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 32"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_32",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 33"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_33",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 34"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_34",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 35"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_35",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 36"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_36",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 37"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_37",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 38"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_38",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 39"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_39",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 40"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_40",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 41"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_41",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 42"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_42",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 43"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_43",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 44"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_44",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 45"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_45",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 46"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_46",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 47"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_47",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 48"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_48",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 49"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_49",
+      "label": "Flier image"
+    },
+    {
+      "type": "header",
+      "content": "Event flier 50"
+    },
+    {
+      "type": "image_picker",
+      "id": "flier_50",
+      "label": "Flier image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Event fliers gallery"
+    }
+  ]
+}
 {% endschema %}
