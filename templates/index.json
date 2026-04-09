@@ -667,19 +667,19 @@
           "type": "ai_gen_block_3781be0",
           "settings": {
             "chat_title": "user1843",
-            "welcome_message": "hi :)",
+            "welcome_message": "What do you want",
             "input_placeholder": "",
             "button_label": "SEND",
             "bottom_position": 20,
             "right_position": 20,
             "bubble_size": 60,
             "bubble_color": "#0a0a0a",
-            "icon_color": "#ea0300",
+            "icon_color": "#efeaea",
             "window_width": 350,
             "window_height": 500,
             "window_border_radius": 0,
             "window_bg_color": "#000000",
-            "border_color": "#8b0000",
+            "border_color": "#ffffff",
             "glow_color": "#8b0000",
             "header_bg_color": "#0a0a0a",
             "header_text_color": "#8b0000",
@@ -696,7 +696,7 @@
             "send_button_bg": "#8b0000",
             "send_button_color": "#000000",
             "send_button_hover_bg": "#b30000",
-            "font": "assistant_n4"
+            "font": "sans_serif_n4"
           },
           "blocks": {}
         }
