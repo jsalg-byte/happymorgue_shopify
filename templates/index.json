@@ -181,31 +181,6 @@
       ],
       "settings": {}
     },
-    "1762319216ce3d6c3d": {
-      "type": "_blocks",
-      "blocks": {
-        "ai_gen_block_5042b5f_NepN8a": {
-          "type": "ai_gen_block_5042b5f",
-          "settings": {
-            "grain_intensity": 10,
-            "grain_opacity": 30,
-            "grain_size": 2,
-            "animation_speed": 60,
-            "blend_mode": "hard-light",
-            "vignette_enabled": true,
-            "vignette_opacity": 40,
-            "vignette_start": 50,
-            "vignette_color": "#000000",
-            "z_index": 99
-          },
-          "blocks": {}
-        }
-      },
-      "block_order": [
-        "ai_gen_block_5042b5f_NepN8a"
-      ],
-      "settings": {}
-    },
     "1762315113cda9f9d5": {
       "type": "_blocks",
       "blocks": {
@@ -234,6 +209,31 @@
       },
       "block_order": [
         "ai_gen_block_ff43c7f_KrkEJH"
+      ],
+      "settings": {}
+    },
+    "1762319216ce3d6c3d": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_5042b5f_NepN8a": {
+          "type": "ai_gen_block_5042b5f",
+          "settings": {
+            "grain_intensity": 10,
+            "grain_opacity": 30,
+            "grain_size": 2,
+            "animation_speed": 60,
+            "blend_mode": "hard-light",
+            "vignette_enabled": true,
+            "vignette_opacity": 40,
+            "vignette_start": 50,
+            "vignette_color": "#000000",
+            "z_index": 99
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_5042b5f_NepN8a"
       ],
       "settings": {}
     },
@@ -726,9 +726,9 @@
   "order": [
     "17624535193cb88f04",
     "1762452594d4c90158",
+    "1762315113cda9f9d5",
     "1762369267aa361c1c",
     "1762319216ce3d6c3d",
-    "1762315113cda9f9d5",
     "rich_text_VJftaw",
     "176232007001e14ddd",
     "image_with_text_4rfep4",
