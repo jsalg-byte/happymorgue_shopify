@@ -293,26 +293,6 @@
     },
     "image_with_text_4rfep4": {
       "type": "image-with-text",
-      "blocks": {
-        "heading_tCiXDL": {
-          "type": "heading",
-          "settings": {
-            "heading": "About us",
-            "heading_size": "h1"
-          }
-        },
-        "text_ynfH9g": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Happy Morgue is a Miami-based underground collective operating at the intersection of music, culture, and experience. Rooted in the raw energy of techno, we curate immersive events featuring boundary-pushing artists and uncompromising atmospheres that go beyond the traditional nightclub format.</p><p><br/></p><p>More than just promoters, we are world-builders—expanding our universe through original merchandise, interactive media, and upcoming game projects that blur the line between physical and digital spaces. Every release, every event, and every concept is designed to feel like stepping into something larger than a party—an evolving experience shaped by sound, environment, and community.</p>",
-            "text_style": "body"
-          }
-        }
-      },
-      "block_order": [
-        "heading_tCiXDL",
-        "text_ynfH9g"
-      ],
       "name": "t:sections.image-with-text.presets.name",
       "settings": {
         "image": "shopify://shop_images/happymorguelogo_8cf5985b-652c-4410-a095-412ddbd527a2.png",
@@ -360,6 +340,45 @@
     },
     "176231566066038686": {
       "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_c338630_L7pzhG": {
+          "type": "ai_gen_block_c338630",
+          "settings": {
+            "heading": "<strong>About us</strong>",
+            "text": "<p>Happy Morgue is a Miami-based underground collective operating at the intersection of music, culture, and experience. Rooted in the raw energy of techno, we curate immersive events featuring boundary-pushing artists and uncompromising atmospheres that go beyond the traditional nightclub format.</p><p>More than just promoters, we are world-builders—expanding our universe through original merchandise, interactive media, and upcoming game projects that blur the line between physical and digital spaces. Every release, every event, and every concept is designed to feel like stepping into something larger than a party—an evolving experience shaped by sound, environment, and community.</p>",
+            "show_image": false,
+            "image_border_radius": 0,
+            "button_text": "Learn more",
+            "button_link": "",
+            "button_text_size": 16,
+            "button_padding_vertical": 12,
+            "button_padding_horizontal": 24,
+            "button_border_radius": 0,
+            "button_background_color": "#121212",
+            "button_text_color": "#ffffff",
+            "button_hover_background_color": "#000000",
+            "button_hover_text_color": "#ffffff",
+            "layout": "row",
+            "text_alignment": "left",
+            "content_gap": 40,
+            "desktop_width_percent": 100,
+            "padding_top": 40,
+            "padding_bottom": 40,
+            "padding_horizontal": 20,
+            "heading_spacing": 16,
+            "text_spacing": 24,
+            "background_color": "#000000",
+            "heading_color": "#121212",
+            "text_color": "#ffffff",
+            "heading_size": 32,
+            "text_size": 16
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_c338630_L7pzhG"
+      ],
       "settings": {}
     },
     "17623166843b581edd": {
