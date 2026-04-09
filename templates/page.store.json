@@ -1,1 +1,211 @@
-{"sections":{"1762309935339e17c8":{"type":"_blocks","blocks":{"ai_gen_block_112a929_c9p7KN":{"type":"ai_gen_block_112a929","settings":{"heading":"Clothing","description":"","collection":"clothing","products_to_show":8,"columns_desktop":4,"columns_tablet":3,"columns_mobile":"2","text_alignment":"left","grid_gap":20,"max_width":1200,"background_color":"#000000","heading_color":"#ff0000","text_color":"#ff0000","price_color":"#ff0000","heading_size":32,"description_size":16,"image_radius":0,"section_padding":40},"blocks":{}}},"block_order":["ai_gen_block_112a929_c9p7KN"],"settings":{}},"main":{"type":"main-page","disabled":true,"settings":{"padding_top":28,"padding_bottom":28}},"featured_product_7LrzKX":{"type":"featured-product","blocks":{"text_KifNj8":{"type":"text","settings":{"text":"{{ section.settings.product.vendor }}","text_style":"uppercase"}},"title_hECkGj":{"type":"title","settings":{"heading_size":"h1"}},"price_WNX3HU":{"type":"price","settings":{}},"variant_picker_6jAFPB":{"type":"variant_picker","settings":{"picker_type":"button","swatch_shape":"circle"}},"quantity_selector_V7hCqb":{"type":"quantity_selector","settings":{}},"buy_buttons_ihmqiH":{"type":"buy_buttons","settings":{"show_dynamic_checkout":false,"show_gift_card_recipient":true}},"share_mVJ9FR":{"type":"share","settings":{"share_label":"Share"}}},"block_order":["text_KifNj8","title_hECkGj","price_WNX3HU","variant_picker_6jAFPB","quantity_selector_V7hCqb","buy_buttons_ihmqiH","share_mVJ9FR"],"name":"t:sections.featured-product.presets.name","settings":{"product":"logo-hoodie","color_scheme":"","secondary_background":false,"media_size":"medium","constrain_to_viewport":true,"media_fit":"contain","media_position":"left","image_zoom":"lightbox","hide_variants":false,"enable_video_looping":false,"padding_top":36,"padding_bottom":36}},"blocks_NMx8J4":{"type":"_blocks","blocks":{"ai_gen_block_f3985f1_bYKzMc":{"type":"ai_gen_block_f3985f1","settings":{"overlay_opacity":85,"z_index":9900,"scanline_spacing":2,"scanline_opacity":0,"grain_intensity":15,"grain_opacity":5,"enable_flicker":true,"flicker_intensity":70,"enable_rgb_shift":true,"rgb_shift_intensity":10,"enable_curvature":true,"enable_vignette":true,"vignette_intensity":25},"blocks":{}},"ai_gen_block_5042b5f_QxUNGk":{"type":"ai_gen_block_5042b5f","settings":{"grain_intensity":10,"grain_opacity":25,"grain_size":2,"animation_speed":60,"blend_mode":"hard-light","vignette_enabled":true,"vignette_opacity":40,"vignette_start":50,"vignette_color":"#000000","z_index":99},"blocks":{}},"ai_gen_block_0abfac3_k6wUJP":{"type":"ai_gen_block_0abfac3","settings":{"overlay_opacity":100,"blend_mode":"overlay","z_index":99,"scanline_opacity":0,"scanline_spacing":1,"grain_intensity":0,"color_distortion":15,"color_shift_r":255,"color_shift_g":0,"color_shift_b":100,"chromatic_aberration":55,"tracking_distortion":100,"vignette_intensity":40,"enable_flicker":true,"flicker_speed":10},"blocks":{}},"ai_gen_block_6cf0a49_j49bQn":{"type":"ai_gen_block_6cf0a49","disabled":true,"settings":{"glow_color":"#ffffff","glow_opacity":0.1,"edge_glow":150,"scanline_intensity":0,"vignette_intensity":0.5,"noise_intensity":0.1},"blocks":{}}},"block_order":["ai_gen_block_f3985f1_bYKzMc","ai_gen_block_5042b5f_QxUNGk","ai_gen_block_0abfac3_k6wUJP","ai_gen_block_6cf0a49_j49bQn"],"settings":{}}},"order":["1762309935339e17c8","main","featured_product_7LrzKX","blocks_NMx8J4"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "1762309935339e17c8": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_112a929_c9p7KN": {
+          "type": "ai_gen_block_112a929",
+          "settings": {
+            "heading": "Clothing",
+            "description": "",
+            "collection": "clothing",
+            "products_to_show": 8,
+            "columns_desktop": 4,
+            "columns_tablet": 3,
+            "columns_mobile": "2",
+            "text_alignment": "left",
+            "grid_gap": 20,
+            "max_width": 1200,
+            "background_color": "#000000",
+            "heading_color": "#fafafa",
+            "text_color": "#fafafa",
+            "price_color": "#ffffff",
+            "heading_size": 32,
+            "description_size": 16,
+            "image_radius": 0,
+            "section_padding": 40
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_112a929_c9p7KN"
+      ],
+      "settings": {}
+    },
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "padding_top": 28,
+        "padding_bottom": 28
+      }
+    },
+    "featured_product_7LrzKX": {
+      "type": "featured-product",
+      "blocks": {
+        "text_KifNj8": {
+          "type": "text",
+          "settings": {
+            "text": "{{ section.settings.product.vendor }}",
+            "text_style": "uppercase"
+          }
+        },
+        "title_hECkGj": {
+          "type": "title",
+          "settings": {
+            "heading_size": "h1"
+          }
+        },
+        "price_WNX3HU": {
+          "type": "price",
+          "settings": {}
+        },
+        "variant_picker_6jAFPB": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "button",
+            "swatch_shape": "circle"
+          }
+        },
+        "quantity_selector_V7hCqb": {
+          "type": "quantity_selector",
+          "settings": {}
+        },
+        "buy_buttons_ihmqiH": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": false,
+            "show_gift_card_recipient": true
+          }
+        },
+        "share_mVJ9FR": {
+          "type": "share",
+          "settings": {
+            "share_label": "Share"
+          }
+        }
+      },
+      "block_order": [
+        "text_KifNj8",
+        "title_hECkGj",
+        "price_WNX3HU",
+        "variant_picker_6jAFPB",
+        "quantity_selector_V7hCqb",
+        "buy_buttons_ihmqiH",
+        "share_mVJ9FR"
+      ],
+      "name": "t:sections.featured-product.presets.name",
+      "settings": {
+        "product": "logo-hoodie",
+        "color_scheme": "scheme-4",
+        "secondary_background": false,
+        "media_size": "medium",
+        "constrain_to_viewport": true,
+        "media_fit": "contain",
+        "media_position": "left",
+        "image_zoom": "lightbox",
+        "hide_variants": false,
+        "enable_video_looping": false,
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "blocks_NMx8J4": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_f3985f1_bYKzMc": {
+          "type": "ai_gen_block_f3985f1",
+          "settings": {
+            "overlay_opacity": 85,
+            "z_index": 9900,
+            "scanline_spacing": 2,
+            "scanline_opacity": 0,
+            "grain_intensity": 15,
+            "grain_opacity": 5,
+            "enable_flicker": true,
+            "flicker_intensity": 70,
+            "enable_rgb_shift": true,
+            "rgb_shift_intensity": 10,
+            "enable_curvature": true,
+            "enable_vignette": true,
+            "vignette_intensity": 25
+          },
+          "blocks": {}
+        },
+        "ai_gen_block_5042b5f_QxUNGk": {
+          "type": "ai_gen_block_5042b5f",
+          "settings": {
+            "grain_intensity": 10,
+            "grain_opacity": 25,
+            "grain_size": 2,
+            "animation_speed": 60,
+            "blend_mode": "hard-light",
+            "vignette_enabled": true,
+            "vignette_opacity": 40,
+            "vignette_start": 50,
+            "vignette_color": "#000000",
+            "z_index": 99
+          },
+          "blocks": {}
+        },
+        "ai_gen_block_0abfac3_k6wUJP": {
+          "type": "ai_gen_block_0abfac3",
+          "settings": {
+            "overlay_opacity": 100,
+            "blend_mode": "overlay",
+            "z_index": 99,
+            "scanline_opacity": 0,
+            "scanline_spacing": 1,
+            "grain_intensity": 0,
+            "color_distortion": 15,
+            "color_shift_r": 255,
+            "color_shift_g": 0,
+            "color_shift_b": 100,
+            "chromatic_aberration": 55,
+            "tracking_distortion": 100,
+            "vignette_intensity": 40,
+            "enable_flicker": true,
+            "flicker_speed": 10
+          },
+          "blocks": {}
+        },
+        "ai_gen_block_6cf0a49_j49bQn": {
+          "type": "ai_gen_block_6cf0a49",
+          "disabled": true,
+          "settings": {
+            "glow_color": "#ffffff",
+            "glow_opacity": 0.1,
+            "edge_glow": 150,
+            "scanline_intensity": 0,
+            "vignette_intensity": 0.5,
+            "noise_intensity": 0.1
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_f3985f1_bYKzMc",
+        "ai_gen_block_5042b5f_QxUNGk",
+        "ai_gen_block_0abfac3_k6wUJP",
+        "ai_gen_block_6cf0a49_j49bQn"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "1762309935339e17c8",
+    "main",
+    "featured_product_7LrzKX",
+    "blocks_NMx8J4"
+  ]
+}

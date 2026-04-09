@@ -1,1 +1,269 @@
-{"sections":{"banner":{"type":"main-collection-banner","settings":{"show_collection_description":true,"show_collection_image":false,"color_scheme":"scheme-1"}},"rich_text_AVHzxy":{"type":"rich-text","blocks":{"heading_hCJU6C":{"type":"heading","settings":{"heading":"<strong>Rated R<\/strong>","heading_size":"h1"}},"text_xUDryt":{"type":"text","settings":{"text":"<p>One of our upcoming projects that's still in development. <\/p>"}}},"block_order":["heading_hCJU6C","text_xUDryt"],"name":"t:sections.rich-text.presets.name","settings":{"desktop_content_position":"center","content_alignment":"center","color_scheme":"","full_width":true,"padding_top":40,"padding_bottom":52}},"1762302526994ae606":{"type":"_blocks","blocks":{"ai_gen_block_8abc33c_7CUyj3":{"type":"ai_gen_block_8abc33c","settings":{"heading":"","heading_size":32,"background_color":"#000000","text_color":"#d80000","spacing":8,"border_radius":0,"image_1":"shopify:\/\/shop_images\/Screenshot_2025-09-30_134038.jpg","caption_1":"","image_2":"shopify:\/\/shop_images\/Screenshot_2025-09-30_133820.jpg","caption_2":"","image_3":"shopify:\/\/shop_images\/Screenshot_2025-09-27_165349.jpg","caption_3":"","image_4":"shopify:\/\/shop_images\/Screenshot_2025-09-26_235046.jpg","caption_4":""},"blocks":{}}},"block_order":["ai_gen_block_8abc33c_7CUyj3"],"settings":{}},"17623016751d38bb7c":{"type":"_blocks","settings":{}},"product-grid":{"type":"main-collection-product-grid","disabled":true,"settings":{"products_per_page":8,"columns_desktop":1,"columns_mobile":"2","color_scheme":"scheme-1","image_ratio":"adapt","image_shape":"default","show_secondary_image":false,"show_vendor":false,"show_rating":false,"quick_add":"none","enable_filtering":false,"filter_type":"horizontal","enable_sorting":true,"padding_top":36,"padding_bottom":36}},"video_dhBDkF":{"type":"video","name":"t:sections.video.presets.name","settings":{"heading":"","heading_size":"h2","enable_video_looping":false,"video":"shopify:\/\/files\/videos\/FREAK FACE.mp4","video_url":"https:\/\/www.youtube.com\/watch?v=_9VUPq3SxOc","description":"","full_width":false,"color_scheme":"","padding_top":0,"padding_bottom":0}},"rich_text_hEgaaL":{"type":"rich-text","blocks":{"heading_KBGR8X":{"type":"heading","settings":{"heading":"<strong>FREAK FACE<\/strong>","heading_size":"h1"}},"text_axyhNz":{"type":"text","settings":{"text":"<p>FREAK FACE is our first official game title in development. we don't have an expected release date yet but we will update as we go. you can wishlist on steam now!<\/p>"}},"button_Eabdix":{"type":"button","settings":{"button_label":"wishlist","button_link":"https:\/\/store.steampowered.com\/app\/3488570\/Freak_Face\/","button_style_secondary":false,"button_label_2":"","button_link_2":"","button_style_secondary_2":false}}},"block_order":["heading_KBGR8X","text_axyhNz","button_Eabdix"],"name":"t:sections.rich-text.presets.name","settings":{"desktop_content_position":"center","content_alignment":"center","color_scheme":"","full_width":true,"padding_top":40,"padding_bottom":52}},"blocks_AYHxtK":{"type":"_blocks","blocks":{"ai_gen_block_9523a86_474tYd":{"type":"ai_gen_block_9523a86","settings":{"section_title":"","section_subtitle":"","text_alignment":"center","max_width":1200,"section_padding":60,"grid_gap":20,"image_1":"shopify:\/\/shop_images\/Screenshot_2025-11-04_181948.jpg","image_2":"shopify:\/\/shop_images\/Screenshot_2025-11-04_182006.jpg","image_3":"shopify:\/\/shop_images\/Screenshot_2025-11-04_181924.jpg","image_4":"shopify:\/\/shop_images\/Screenshot_2025-11-04_182103.jpg","image_5":"shopify:\/\/shop_images\/rated_r_sc_5.jpg","background_color":"#000000","title_color":"#d80000","subtitle_color":"#666666","item_background":"#ffffff","title_size":40,"subtitle_size":16,"item_border_radius":8},"blocks":{}}},"block_order":["ai_gen_block_9523a86_474tYd"],"settings":{}},"blocks_Ur8AXq":{"type":"_blocks","blocks":{"ai_gen_block_f3985f1_mamdQK":{"type":"ai_gen_block_f3985f1","disabled":true,"settings":{"overlay_opacity":85,"z_index":9900,"scanline_spacing":2,"scanline_opacity":5,"grain_intensity":15,"grain_opacity":5,"enable_flicker":true,"flicker_intensity":70,"enable_rgb_shift":true,"rgb_shift_intensity":10,"enable_curvature":true,"enable_vignette":true,"vignette_intensity":25},"blocks":{}},"ai_gen_block_5042b5f_PyPQc4":{"type":"ai_gen_block_5042b5f","settings":{"grain_intensity":10,"grain_opacity":30,"grain_size":2,"animation_speed":60,"blend_mode":"hard-light","vignette_enabled":true,"vignette_opacity":40,"vignette_start":50,"vignette_color":"#000000","z_index":99},"blocks":{}},"ai_gen_block_6cf0a49_mqK8Ph":{"type":"ai_gen_block_6cf0a49","disabled":true,"settings":{"glow_color":"#ffffff","glow_opacity":0.1,"edge_glow":150,"scanline_intensity":0,"vignette_intensity":0.5,"noise_intensity":0.1},"blocks":{}}},"block_order":["ai_gen_block_f3985f1_mamdQK","ai_gen_block_5042b5f_PyPQc4","ai_gen_block_6cf0a49_mqK8Ph"],"settings":{}}},"order":["banner","rich_text_AVHzxy","1762302526994ae606","17623016751d38bb7c","product-grid","video_dhBDkF","rich_text_hEgaaL","blocks_AYHxtK","blocks_Ur8AXq"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "banner": {
+      "type": "main-collection-banner",
+      "settings": {
+        "show_collection_description": true,
+        "show_collection_image": false,
+        "color_scheme": "scheme-4"
+      }
+    },
+    "rich_text_AVHzxy": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_hCJU6C": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>Rated R</strong>",
+            "heading_size": "h1"
+          }
+        },
+        "text_xUDryt": {
+          "type": "text",
+          "settings": {
+            "text": "<p>One of our upcoming projects that's still in development. </p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading_hCJU6C",
+        "text_xUDryt"
+      ],
+      "name": "t:sections.rich-text.presets.name",
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "center",
+        "color_scheme": "scheme-4",
+        "full_width": true,
+        "padding_top": 40,
+        "padding_bottom": 52
+      }
+    },
+    "1762302526994ae606": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_8abc33c_7CUyj3": {
+          "type": "ai_gen_block_8abc33c",
+          "settings": {
+            "heading": "",
+            "heading_size": 32,
+            "background_color": "#000000",
+            "text_color": "#d80000",
+            "spacing": 8,
+            "border_radius": 0,
+            "image_1": "shopify://shop_images/Screenshot_2025-09-30_134038.jpg",
+            "caption_1": "",
+            "image_2": "shopify://shop_images/Screenshot_2025-09-30_133820.jpg",
+            "caption_2": "",
+            "image_3": "shopify://shop_images/Screenshot_2025-09-27_165349.jpg",
+            "caption_3": "",
+            "image_4": "shopify://shop_images/Screenshot_2025-09-26_235046.jpg",
+            "caption_4": ""
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_8abc33c_7CUyj3"
+      ],
+      "settings": {}
+    },
+    "17623016751d38bb7c": {
+      "type": "_blocks",
+      "settings": {}
+    },
+    "product-grid": {
+      "type": "main-collection-product-grid",
+      "disabled": true,
+      "settings": {
+        "products_per_page": 8,
+        "columns_desktop": 1,
+        "columns_mobile": "2",
+        "color_scheme": "scheme-1",
+        "image_ratio": "adapt",
+        "image_shape": "default",
+        "show_secondary_image": false,
+        "show_vendor": false,
+        "show_rating": false,
+        "quick_add": "none",
+        "enable_filtering": false,
+        "filter_type": "horizontal",
+        "enable_sorting": true,
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
+    "video_dhBDkF": {
+      "type": "video",
+      "name": "t:sections.video.presets.name",
+      "settings": {
+        "heading": "",
+        "heading_size": "h2",
+        "enable_video_looping": false,
+        "video": "shopify://files/videos/FREAK FACE.mp4",
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "full_width": false,
+        "color_scheme": "",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "rich_text_hEgaaL": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_KBGR8X": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>FREAK FACE</strong>",
+            "heading_size": "h1"
+          }
+        },
+        "text_axyhNz": {
+          "type": "text",
+          "settings": {
+            "text": "<p>FREAK FACE is our first official game title in development. we don't have an expected release date yet but we will update as we go. you can wishlist on steam now!</p>"
+          }
+        },
+        "button_Eabdix": {
+          "type": "button",
+          "settings": {
+            "button_label": "wishlist",
+            "button_link": "https://store.steampowered.com/app/3488570/Freak_Face/",
+            "button_style_secondary": false,
+            "button_label_2": "",
+            "button_link_2": "",
+            "button_style_secondary_2": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_KBGR8X",
+        "text_axyhNz",
+        "button_Eabdix"
+      ],
+      "name": "t:sections.rich-text.presets.name",
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "center",
+        "color_scheme": "scheme-4",
+        "full_width": true,
+        "padding_top": 40,
+        "padding_bottom": 52
+      }
+    },
+    "blocks_AYHxtK": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_9523a86_474tYd": {
+          "type": "ai_gen_block_9523a86",
+          "settings": {
+            "section_title": "",
+            "section_subtitle": "",
+            "text_alignment": "center",
+            "max_width": 1200,
+            "section_padding": 60,
+            "grid_gap": 20,
+            "image_1": "shopify://shop_images/Screenshot_2025-11-04_181948.jpg",
+            "image_2": "shopify://shop_images/Screenshot_2025-11-04_182006.jpg",
+            "image_3": "shopify://shop_images/Screenshot_2025-11-04_181924.jpg",
+            "image_4": "shopify://shop_images/Screenshot_2025-11-04_182103.jpg",
+            "image_5": "shopify://shop_images/rated_r_sc_5.jpg",
+            "background_color": "#000000",
+            "title_color": "#d80000",
+            "subtitle_color": "#666666",
+            "item_background": "#ffffff",
+            "title_size": 40,
+            "subtitle_size": 16,
+            "item_border_radius": 8
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_9523a86_474tYd"
+      ],
+      "settings": {}
+    },
+    "blocks_Ur8AXq": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_f3985f1_mamdQK": {
+          "type": "ai_gen_block_f3985f1",
+          "disabled": true,
+          "settings": {
+            "overlay_opacity": 85,
+            "z_index": 9900,
+            "scanline_spacing": 2,
+            "scanline_opacity": 5,
+            "grain_intensity": 15,
+            "grain_opacity": 5,
+            "enable_flicker": true,
+            "flicker_intensity": 70,
+            "enable_rgb_shift": true,
+            "rgb_shift_intensity": 10,
+            "enable_curvature": true,
+            "enable_vignette": true,
+            "vignette_intensity": 25
+          },
+          "blocks": {}
+        },
+        "ai_gen_block_5042b5f_PyPQc4": {
+          "type": "ai_gen_block_5042b5f",
+          "settings": {
+            "grain_intensity": 10,
+            "grain_opacity": 30,
+            "grain_size": 2,
+            "animation_speed": 60,
+            "blend_mode": "hard-light",
+            "vignette_enabled": true,
+            "vignette_opacity": 40,
+            "vignette_start": 50,
+            "vignette_color": "#000000",
+            "z_index": 99
+          },
+          "blocks": {}
+        },
+        "ai_gen_block_6cf0a49_mqK8Ph": {
+          "type": "ai_gen_block_6cf0a49",
+          "disabled": true,
+          "settings": {
+            "glow_color": "#ffffff",
+            "glow_opacity": 0.1,
+            "edge_glow": 150,
+            "scanline_intensity": 0,
+            "vignette_intensity": 0.5,
+            "noise_intensity": 0.1
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_f3985f1_mamdQK",
+        "ai_gen_block_5042b5f_PyPQc4",
+        "ai_gen_block_6cf0a49_mqK8Ph"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "banner",
+    "rich_text_AVHzxy",
+    "1762302526994ae606",
+    "17623016751d38bb7c",
+    "product-grid",
+    "video_dhBDkF",
+    "rich_text_hEgaaL",
+    "blocks_AYHxtK",
+    "blocks_Ur8AXq"
+  ]
+}
