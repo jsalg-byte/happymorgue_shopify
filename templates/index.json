@@ -22,9 +22,13 @@
             "background_color": "#000000",
             "dot_color": "#ffffff",
             "image_1": "shopify://shop_images/IMG_4325.jpg",
-            "image_2": "shopify://shop_images/6E13D6AB-F992-4344-B85B-08BE7340E89E.png",
-            "image_3": "shopify://shop_images/IMG_6166_fc0c77b1-a81a-4823-a9d9-290fc3086bbe.jpg",
-            "image_4": "shopify://shop_images/IMG_6183.jpg"
+            "image_2": "shopify://shop_images/IMG_9056.jpg",
+            "image_3": "shopify://shop_images/6E13D6AB-F992-4344-B85B-08BE7340E89E.png",
+            "image_4": "shopify://shop_images/IMG_4336.jpg",
+            "image_5": "shopify://shop_images/IMG_9058.jpg",
+            "image_6": "shopify://shop_images/IMG_6194.jpg",
+            "image_7": "shopify://shop_images/IMG_6731_7923de1a-026e-4905-81cb-f2d4d5704c1d.jpg",
+            "image_8": "shopify://shop_images/IMG_6183.jpg"
           },
           "blocks": {}
         }
