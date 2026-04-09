@@ -1,6 +1,466 @@
+{% doc %}
+  @prompt
+    A section to display our upcoming games with a tab that leads to the games tab. , I mean our video games that we have on steam, Make it just upcoming games as we have no games out yet , Actually just make it more simple just add a image slide show with a upcoming games button that leads to our games tab
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-games-slideshow-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    position: relative;
+  }
+
+  .ai-games-slideshow-container-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: {{ block.settings.border_radius }}px;
+  }
+
+  .ai-games-slideshow-wrapper-{{ ai_gen_id }} {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+  }
+
+  .ai-games-slide-{{ ai_gen_id }} {
+    min-width: 100%;
+    position: relative;
+  }
+
+  .ai-games-slide-{{ ai_gen_id }} img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .ai-games-slide-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: #1b2838;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-games-slide-placeholder-{{ ai_gen_id }} svg {
+    width: 50%;
+    height: 50%;
+    opacity: 0.3;
+  }
+
+  .ai-games-slideshow-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 40px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .ai-games-button-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 32px;
+    background-color: {{ block.settings.button_color }};
+    color: {{ block.settings.button_text_color }};
+    text-decoration: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: {{ block.settings.button_font_size }}px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .ai-games-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_color }};
+    transform: translateY(-2px);
+  }
+
+  .ai-games-nav-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+    z-index: 2;
+  }
+
+  .ai-games-nav-{{ ai_gen_id }}:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+
+  .ai-games-nav-prev-{{ ai_gen_id }} {
+    left: 20px;
+  }
+
+  .ai-games-nav-next-{{ ai_gen_id }} {
+    right: 20px;
+  }
+
+  .ai-games-dots-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 2;
+  }
+
+  .ai-games-dot-{{ ai_gen_id }} {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    padding: 0;
+  }
+
+  .ai-games-dot-{{ ai_gen_id }}.active {
+    background-color: #ffffff;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-games-slideshow-overlay-{{ ai_gen_id }} {
+      padding: 20px;
+    }
+
+    .ai-games-button-{{ ai_gen_id }} {
+      padding: 12px 24px;
+      font-size: 14px;
+    }
+
+    .ai-games-nav-{{ ai_gen_id }} {
+      width: 40px;
+      height: 40px;
+    }
+
+    .ai-games-nav-prev-{{ ai_gen_id }} {
+      left: 10px;
+    }
+
+    .ai-games-nav-next-{{ ai_gen_id }} {
+      right: 10px;
+    }
+
+    .ai-games-dots-{{ ai_gen_id }} {
+      bottom: 60px;
+    }
+  }
+{% endstyle %}
+
+<upcoming-games-slideshow-{{ ai_gen_id }} class="ai-games-slideshow-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-games-slideshow-container-{{ ai_gen_id }}">
+    <div class="ai-games-slideshow-wrapper-{{ ai_gen_id }}">
+      {% for i in (1..5) %}
+        {% liquid
+          assign image_key = 'slide_' | append: i | append: '_image'
+          assign slide_image = block.settings[image_key]
+        %}
+        <div class="ai-games-slide-{{ ai_gen_id }}">
+          {% if slide_image %}
+            <img
+              src="{{ slide_image | image_url: width: 1600 }}"
+              alt="{{ slide_image.alt | escape }}"
+              loading="lazy"
+              width="{{ slide_image.width }}"
+              height="{{ slide_image.height }}"
+            >
+          {% else %}
+            <div class="ai-games-slide-placeholder-{{ ai_gen_id }}">
+              {{ 'hero-apparel-1' | placeholder_svg_tag }}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if block.settings.show_navigation %}
+      <button class="ai-games-nav-{{ ai_gen_id }} ai-games-nav-prev-{{ ai_gen_id }}" aria-label="Previous slide">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button class="ai-games-nav-{{ ai_gen_id }} ai-games-nav-next-{{ ai_gen_id }}" aria-label="Next slide">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    {% endif %}
+
+    {% if block.settings.show_dots %}
+      <div class="ai-games-dots-{{ ai_gen_id }}">
+        {% for i in (1..5) %}
+          <button class="ai-games-dot-{{ ai_gen_id }}{% if i == 1 %} active{% endif %}" data-slide="{{ i | minus: 1 }}" aria-label="Go to slide {{ i }}"></button>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="ai-games-slideshow-overlay-{{ ai_gen_id }}">
+      <a href="{{ block.settings.games_page_link }}" class="ai-games-button-{{ ai_gen_id }}">
+        {{ block.settings.button_text }}
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+    </div>
+  </div>
+</upcoming-games-slideshow-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class UpcomingGamesSlideshow{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentSlide = 0;
+        this.totalSlides = 5;
+        this.autoplayInterval = null;
+      }
+
+      connectedCallback() {
+        this.wrapper = this.querySelector('.ai-games-slideshow-wrapper-{{ ai_gen_id }}');
+        this.prevButton = this.querySelector('.ai-games-nav-prev-{{ ai_gen_id }}');
+        this.nextButton = this.querySelector('.ai-games-nav-next-{{ ai_gen_id }}');
+        this.dots = this.querySelectorAll('.ai-games-dot-{{ ai_gen_id }}');
+
+        this.setupEventListeners();
+        this.startAutoplay();
+      }
+
+      setupEventListeners() {
+        if (this.prevButton) {
+          this.prevButton.addEventListener('click', () => {
+            this.goToSlide(this.currentSlide - 1);
+            this.resetAutoplay();
+          });
+        }
+
+        if (this.nextButton) {
+          this.nextButton.addEventListener('click', () => {
+            this.goToSlide(this.currentSlide + 1);
+            this.resetAutoplay();
+          });
+        }
+
+        this.dots.forEach((dot, index) => {
+          dot.addEventListener('click', () => {
+            this.goToSlide(index);
+            this.resetAutoplay();
+          });
+        });
+      }
+
+      goToSlide(index) {
+        if (index < 0) {
+          this.currentSlide = this.totalSlides - 1;
+        } else if (index >= this.totalSlides) {
+          this.currentSlide = 0;
+        } else {
+          this.currentSlide = index;
+        }
+
+        const offset = -this.currentSlide * 100;
+        this.wrapper.style.transform = `translateX(${offset}%)`;
+
+        this.dots.forEach((dot, i) => {
+          if (i === this.currentSlide) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+
+      startAutoplay() {
+        const autoplayEnabled = {{ block.settings.autoplay }};
+        const autoplaySpeed = {{ block.settings.autoplay_speed }} * 1000;
+
+        if (autoplayEnabled) {
+          this.autoplayInterval = setInterval(() => {
+            this.goToSlide(this.currentSlide + 1);
+          }, autoplaySpeed);
+        }
+      }
+
+      resetAutoplay() {
+        if (this.autoplayInterval) {
+          clearInterval(this.autoplayInterval);
+          this.startAutoplay();
+        }
+      }
+
+      disconnectedCallback() {
+        if (this.autoplayInterval) {
+          clearInterval(this.autoplayInterval);
+        }
+      }
+    }
+
+    customElements.define('upcoming-games-slideshow-{{ ai_gen_id }}', UpcomingGamesSlideshow{{ ai_gen_id }});
+  })();
+</script>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Upcoming games slideshow",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Slideshow"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_1_image",
+      "label": "Slide 1 image"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_2_image",
+      "label": "Slide 2 image"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_3_image",
+      "label": "Slide 3 image"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_4_image",
+      "label": "Slide 4 image"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_5_image",
+      "label": "Slide 5 image"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Upcoming Games"
+    },
+    {
+      "type": "url",
+      "id": "games_page_link",
+      "label": "Games page link"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Background color",
+      "default": "#d80000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_color",
+      "label": "Hover background color",
+      "default": "#b00000"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Slideshow controls"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_navigation",
+      "label": "Show navigation arrows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "Show dots",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Autoplay speed",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    }
+  ],
+  "presets": [
+    {
+      "name": "Upcoming games slideshow"
+    }
+  ]
+}
 {% endschema %}
