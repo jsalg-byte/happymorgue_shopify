@@ -1,6 +1,353 @@
+{% doc %}
+  @prompt
+    Make a slide show image that scrolls automatically. Give us a good amount of editing options for speed. Give us an unlimited amount of slots for images. Make it very minimal 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-slideshow-{{ ai_gen_id }} {
+    display: block;
+    position: relative;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .ai-slideshow-container-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: {{ block.settings.slideshow_height }}px;
+  }
+
+  .ai-slideshow-track-{{ ai_gen_id }} {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform {{ block.settings.transition_speed }}s ease-in-out;
+  }
+
+  .ai-slideshow-slide-{{ ai_gen_id }} {
+    min-width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+  }
+
+  .ai-slideshow-slide-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-slideshow-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-slideshow-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 500px;
+    max-height: 500px;
+  }
+
+  .ai-slideshow-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-slideshow-container-{{ ai_gen_id }} {
+      height: {{ block.settings.slideshow_height_mobile }}px;
+    }
+  }
+{% endstyle %}
+
+<auto-slideshow-{{ ai_gen_id }}
+  class="ai-slideshow-{{ ai_gen_id }}"
+  data-autoplay-speed="{{ block.settings.autoplay_speed }}"
+  data-transition-speed="{{ block.settings.transition_speed }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-slideshow-container-{{ ai_gen_id }}">
+    <div class="ai-slideshow-track-{{ ai_gen_id }}">
+      {% liquid
+        assign has_images = false
+        for i in (1..20)
+          assign image_key = 'image_' | append: i
+          if block.settings[image_key] != blank
+            assign has_images = true
+            break
+          endif
+        endfor
+      %}
+
+      {% if has_images %}
+        {% for i in (1..20) %}
+          {% liquid
+            assign image_key = 'image_' | append: i
+            assign image = block.settings[image_key]
+          %}
+          {% if image != blank %}
+            <div class="ai-slideshow-slide-{{ ai_gen_id }}">
+              <img
+                src="{{ image | image_url: width: 2000 }}"
+                alt="{{ image.alt | escape }}"
+                loading="lazy"
+                width="{{ image.width }}"
+                height="{{ image.height }}"
+              >
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <div class="ai-slideshow-slide-{{ ai_gen_id }}">
+          <div class="ai-slideshow-placeholder-{{ ai_gen_id }}">
+            {{ 'image' | placeholder_svg_tag }}
+            <div class="ai-slideshow-empty-state-{{ ai_gen_id }}">
+              Add images to start your slideshow
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</auto-slideshow-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class AutoSlideshow{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentIndex = 0;
+        this.autoplayInterval = null;
+      }
+
+      connectedCallback() {
+        this.track = this.querySelector('.ai-slideshow-track-{{ ai_gen_id }}');
+        this.slides = this.querySelectorAll('.ai-slideshow-slide-{{ ai_gen_id }}');
+        this.autoplaySpeed = parseFloat(this.dataset.autoplaySpeed) * 1000;
+        this.transitionSpeed = parseFloat(this.dataset.transitionSpeed);
+
+        if (this.slides.length > 1) {
+          this.startAutoplay();
+        }
+      }
+
+      disconnectedCallback() {
+        this.stopAutoplay();
+      }
+
+      startAutoplay() {
+        this.autoplayInterval = setInterval(() => {
+          this.nextSlide();
+        }, this.autoplaySpeed);
+      }
+
+      stopAutoplay() {
+        if (this.autoplayInterval) {
+          clearInterval(this.autoplayInterval);
+        }
+      }
+
+      nextSlide() {
+        this.currentIndex = (this.currentIndex + 1) % this.slides.length;
+        this.updateSlidePosition();
+      }
+
+      updateSlidePosition() {
+        const offset = -this.currentIndex * 100;
+        this.track.style.transform = `translateX(${offset}%)`;
+      }
+    }
+
+    customElements.define('auto-slideshow-{{ ai_gen_id }}', AutoSlideshow{{ ai_gen_id }});
+  })();
+</script>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Auto slideshow",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "slideshow_height",
+      "label": "Height on desktop",
+      "min": 200,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "slideshow_height_mobile",
+      "label": "Height on mobile",
+      "min": 150,
+      "max": 600,
+      "step": 50,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Speed"
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Autoplay speed",
+      "min": 1,
+      "max": 10,
+      "step": 0.5,
+      "unit": "s",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "transition_speed",
+      "label": "Transition speed",
+      "min": 0.2,
+      "max": 2,
+      "step": 0.1,
+      "unit": "s",
+      "default": 0.5
+    },
+    {
+      "type": "header",
+      "content": "Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "Image 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "Image 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "Image 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_4",
+      "label": "Image 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_5",
+      "label": "Image 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_6",
+      "label": "Image 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_7",
+      "label": "Image 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_8",
+      "label": "Image 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_9",
+      "label": "Image 9"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_10",
+      "label": "Image 10"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_11",
+      "label": "Image 11"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_12",
+      "label": "Image 12"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_13",
+      "label": "Image 13"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_14",
+      "label": "Image 14"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_15",
+      "label": "Image 15"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_16",
+      "label": "Image 16"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_17",
+      "label": "Image 17"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_18",
+      "label": "Image 18"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_19",
+      "label": "Image 19"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_20",
+      "label": "Image 20"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Auto slideshow"
+    }
+  ]
+}
 {% endschema %}
