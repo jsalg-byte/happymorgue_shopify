@@ -29,7 +29,7 @@
             "dot_spacing": 8,
             "dot_padding": 20,
             "dot_color": "#000000",
-            "autoplay": false,
+            "autoplay": true,
             "autoplay_speed": 5,
             "image_1": "shopify://shop_images/IMG_4325.jpg",
             "image_2": "shopify://shop_images/6E13D6AB-F992-4344-B85B-08BE7340E89E.png",
