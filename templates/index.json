@@ -149,7 +149,7 @@
             "poster_image": "shopify://shop_images/3981C3A6-5820-49B0-B252-41581E50BA9B.jpg",
             "poster_width": 240,
             "poster_aspect_ratio": "2/3",
-            "events_button_text": "",
+            "events_button_text": "upcoming event",
             "events_page_link": "shopify://pages/contact",
             "tickets_button_text": "Buy tickets",
             "tickets_link": "https://posh.vip/e/deathmatch",
