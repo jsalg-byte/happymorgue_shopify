@@ -194,12 +194,14 @@
             "background_color": "#000000",
             "flyer_1": "shopify://shop_images/IMG_9332.jpg",
             "flyer_2": "shopify://shop_images/ADCB022C-7BEC-45E3-9295-7D9912D1AA94_748f08e4-9086-4efb-bb87-d7758150be8a.jpg",
-            "flyer_3": "shopify://shop_images/10E2B59B-6B34-4A47-8DBC-CE70EA57170D.jpg",
-            "flyer_4": "shopify://shop_images/6E0F0E36-2F02-4F0E-A48E-2D573479C7AB.jpg",
+            "flyer_3": "shopify://shop_images/IMG_9797.jpg",
+            "flyer_4": "shopify://shop_images/IMG_9798.jpg",
             "flyer_5": "shopify://shop_images/IMG_5378.jpg",
             "flyer_6": "shopify://shop_images/1A145746-8EDF-4E6C-88C3-E363647BD32C.jpg",
             "flyer_7": "shopify://shop_images/A5345215-42F1-440D-AC2A-ED5E2B3CEC44.jpg",
-            "flyer_8": "shopify://shop_images/IMG_8703.jpg"
+            "flyer_8": "shopify://shop_images/IMG_8703.jpg",
+            "flyer_9": "shopify://shop_images/6E0F0E36-2F02-4F0E-A48E-2D573479C7AB.jpg",
+            "flyer_10": "shopify://shop_images/10E2B59B-6B34-4A47-8DBC-CE70EA57170D.jpg"
           },
           "blocks": {}
         }
